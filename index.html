@@ -24,7 +24,7 @@ body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);font
 *{font-feature-settings:"tnum" 1,"zero" 0}
 html{overflow-y:scroll;scrollbar-gutter:stable}
 .ownfoot{margin:24px 0 8px;text-align:center;font-size:11px;color:var(--muted,#8a94a0)}
-/* ===== v1.43 iPhone / iPad ===== */
+/* ===== v1.44 iPhone / iPad ===== */
 nav .ni{display:none;font-style:normal}
 nav .ns{display:none}
 .mback{display:none}
@@ -830,7 +830,7 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
         <li><b>In flight</b>, the flight crew follows ECAM, QRH and FCOM and the operator&#39;s circuit breaker reset policy. Nothing on this site permits or recommends a reset.</li>
         <li><b>On ground</b>, troubleshooting, resets and return to service must be carried out and certified by appropriately authorised staff in accordance with approved data and your organisation&#39;s procedures.</li>
         <li><b>Data may be incomplete, out of date or wrong.</b> C/B FINs, designations, panel locations and effectivity were compiled from a single LEAP-1A powered A320neo and may not match your aircraft (MSN, modification status, engine type). Reset guidance is written by us from general line-maintenance practice and must be checked against your current TSM. ECAM-to-C/B, P/B and MMEL links are automatically generated drafts and have not been validated; MMEL references point to the public FAA MMEL (A318–A321, Rev 30 draft).</li>
-        <li><b>Comments and likes are public.</b> Comments and 👍 likes are shared with all users of this site and are not reviewed or approved. Do not post personal, company-confidential or copyrighted material. Changes you make to a reset procedure are stored only in your own browser.</li>
+        <li><b>Comments and likes are public.</b> Comments and 👍 likes are shared with all users of this site and are not reviewed or approved. Do not post personal, company-confidential or copyrighted material. Changes to reset procedures (conditions, C/B and P/B links) are also shared with all users, together with the name and comment of whoever made them.</li>
         <li><b>Our own content.</b> All explanations, reset guidance, panel drawings and texts on this site are written and drawn by ECAM Reset Assist. They do not reproduce Airbus, airline or third-party documentation.</li>
         <li><b>No affiliation.</b> This site is independent and is not affiliated with, endorsed by or supported by Airbus, CFM International, Pratt &amp; Whitney, any airline or any authority. All trademarks belong to their owners; aircraft photo for illustration only.</li>
         <li><b>No warranty, no liability.</b> Provided “as is”. You use it at your own risk; to the extent permitted by law, the author accepts no liability for any decision, action, damage or loss resulting from its use.</li>
@@ -846,7 +846,7 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
 <div id="app" class="hidden">
   <div class="hero photo"><div class="in">
 
-    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.43 · education only</span></h1>
+    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.44 · education only</span></h1>
       <p>A320neo · ECAM alert → circuit breaker reset study aid · not approved maintenance data</p></div>
     <div class="user">For education and training only<br><button id="logout">Disclaimer</button></div>
   </div></div>
@@ -960,7 +960,8 @@ const PB_DB = [{"id":"IR1","name":"IR 1 P/B","panel":"OVHD \u00b7 ADIRS","fam":"
 const $ = s=>document.querySelector(s);
 const esc = s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2200)}
-const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){window.__MCC_LOCAL_FAIL=String(e&&e.message||e);console.error('MCC SAVE FAILED (browser storage)',e);try{toast('NOT saved – browser storage blocked: '+window.__MCC_LOCAL_FAIL)}catch(_){}}}};
+const SHARED_STORES={mcc_pbs:'pbs',mcc_links:'links',mcc_hide:'hide',mcc_conds:'conds',mcc_drafts:'drafts',mcc_pnotes:'pnotes'};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{if(SHARED_STORES[k]&&typeof statePush==='function')statePush(SHARED_STORES[k],v);}catch(_){} try{localStorage.setItem(k,JSON.stringify(v))}catch(e){window.__MCC_LOCAL_FAIL=String(e&&e.message||e);console.error('MCC SAVE FAILED (browser storage)',e);try{toast('NOT saved – browser storage blocked: '+window.__MCC_LOCAL_FAIL)}catch(_){}}}};
 const sess={get(k){try{return sessionStorage.getItem(k)}catch(e){return window['_s_'+k]}},set(k,v){try{sessionStorage.setItem(k,v)}catch(e){window['_s_'+k]=v}},del(k){try{sessionStorage.removeItem(k)}catch(e){delete window['_s_'+k]}}};
 
 const HOST=null; // stand-alone public build: data is kept in this browser only
@@ -1106,7 +1107,7 @@ const likeCount=id=>likesOf(id,'G').length+likesOf(id,'F').length;
 const saveLikes=()=>store.set('era_likes',LIKES);
 /* ---- shared comments & likes (Supabase). Empty URL/KEY = local-only mode ---- */
 const SB_URL='https://jyknframvdazpivsykbf.supabase.co', SB_KEY='sb_publishable_aWTJPk1OXZ5uB6aHnzUAhQ_qKznualv';
-const LIVE={on:false,ok:false,sb:null};
+const LIVE={on:false,ok:false,sb:null,stOn:false,snap:{},pending:{}};
 const devToken=(()=>{let t=store.get('era_dev','');if(!t){t=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now());store.set('era_dev',t);}return t;})();
 let MY_CMTS=store.get('era_my_cmts',[]);
 const isMine=c=>!LIVE.on||MY_CMTS.includes(c.id);
@@ -1118,16 +1119,29 @@ async function liveLoad(){const sb=LIVE.sb;
   if(c.error||l.error) throw (c.error||l.error);
   const C={}; c.data.forEach(r=>{(C[r.akey]=C[r.akey]||[]).push({id:r.id,text:r.text,name:r.name,eng:r.eng||'',edit:r.edit||'',ts:r.created_at});});
   const L={}; l.data.forEach(r=>{(L[r.akey]=L[r.akey]||[]).push(r.name);});
-  CMTS=C; LIKES=L; LIVE.ok=true; liveRefreshUI();}
+  CMTS=C; LIKES=L;
+  const st=await sb.from('era_state').select('store,akey,value').limit(20000);
+  if(st.error){ if(!LIVE.stWarned){LIVE.stWarned=true;console.warn('shared procedures not set up',st.error);} }
+  else { LIVE.stOn=true; const by={}; Object.values(SHARED_STORES).forEach(n=>by[n]={}); st.data.forEach(r=>{if(by[r.store])by[r.store][r.akey]=r.value;});
+    const tgt={pbs:PBS,links:LINKS,hide:HIDE,conds:CONDS,drafts:DRAFTS,pnotes:PNOTES};
+    Object.entries(tgt).forEach(([n,o])=>{ if(LIVE.pending[n]) return; Object.keys(o).forEach(k=>delete o[k]); Object.assign(o,by[n]); LIVE.snap[n]=Object.fromEntries(Object.entries(by[n]).map(([k,v])=>[k,JSON.stringify(v)])); }); }
+  LIVE.ok=true; liveRefreshUI();}
 let liveT=null; const liveSoon=()=>{clearTimeout(liveT); liveT=setTimeout(()=>liveLoad().catch(liveErr),250);};
 function liveErr(e){console.warn('live sync',e); LIVE.ok=false; document.querySelectorAll('.livebadge-slot').forEach(x=>x.innerHTML='<span class="livebadge err" title="'+esc(String(e&&e.message||e))+'">● offline · retrying</span>');}
 function liveInit(){ if(!/^https:\/\//.test(SB_URL)||SB_KEY.length<20) return; LIVE.on=true;
   const sc=document.createElement('script'); sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; sc.onerror=()=>liveErr('Could not load the Supabase library');
   sc.onload=()=>{ LIVE.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false}});
     liveLoad().catch(liveErr);
-    LIVE.sb.channel('era-live').on('postgres_changes',{event:'*',schema:'public',table:'era_comments'},liveSoon).on('postgres_changes',{event:'*',schema:'public',table:'era_likes'},liveSoon).subscribe();
+    LIVE.sb.channel('era-live').on('postgres_changes',{event:'*',schema:'public',table:'era_comments'},liveSoon).on('postgres_changes',{event:'*',schema:'public',table:'era_likes'},liveSoon).on('postgres_changes',{event:'*',schema:'public',table:'era_state'},liveSoon).subscribe();
     setInterval(()=>liveLoad().catch(liveErr),60000); document.addEventListener('visibilitychange',()=>{if(!document.hidden)liveSoon();}); };
   document.head.appendChild(sc);}
+function statePush(n,obj){ if(!LIVE.on||!LIVE.sb||!LIVE.stOn) return; const snap=LIVE.snap[n]=LIVE.snap[n]||{}, nm=(store.get('era_name','')||'').trim()||'anonymous', jobs=[];
+  const keys=new Set([...Object.keys(snap),...Object.keys(obj||{})]);
+  keys.forEach(k=>{const cur=obj&&obj[k]!==undefined?JSON.stringify(obj[k]):null; if(cur===(snap[k]??null)) return;
+    const empty=cur===null||cur==='[]'||cur==='{}'||(obj[k]&&typeof obj[k]==='object'&&!Array.isArray(obj[k])&&Object.values(obj[k]).every(v=>Array.isArray(v)&&!v.length));
+    jobs.push(LIVE.sb.rpc('era_put_state',{p_store:n,p_key:k,p_value:empty?null:obj[k],p_name:nm}).then(r=>{ if(r.error) throw r.error; if(empty) delete snap[k]; else snap[k]=cur; })); });
+  if(!jobs.length) return; LIVE.pending[n]=(LIVE.pending[n]||0)+1;
+  Promise.all(jobs).catch(e=>toast('Change not shared: '+(e.message||e))).finally(()=>{LIVE.pending[n]--; if(!LIVE.pending[n]) delete LIVE.pending[n]; liveSoon();});}
 async function cmtAdd(key,c){ if(!LIVE.on){(CMTS[key]=CMTS[key]||[]).push(c); saveCmts(); return true;}
   const r=await LIVE.sb.rpc('era_add_comment',{p_akey:key,p_name:c.name,p_text:c.text,p_eng:c.eng||'',p_edit:c.edit||'',p_token:devToken});
   if(r.error){toast('Comment not saved: '+r.error.message); return false;}
