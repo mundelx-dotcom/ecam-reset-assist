@@ -23,7 +23,8 @@
 body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"zero" 0}
 *{font-feature-settings:"tnum" 1,"zero" 0}
 html{overflow-y:scroll;scrollbar-gutter:stable}
-/* ===== v1.42 iPhone / iPad ===== */
+.ownfoot{margin:24px 0 8px;text-align:center;font-size:11px;color:var(--muted,#8a94a0)}
+/* ===== v1.43 iPhone / iPad ===== */
 nav .ni{display:none;font-style:normal}
 nav .ns{display:none}
 .mback{display:none}
@@ -828,8 +829,9 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
         <li><b>Always use your current approved documentation</b> for the specific aircraft (MSN, modification status and engine option): Airbus <b>AMM</b>, <b>TSM</b>, <b>AWM / ASM</b> (wiring and circuit breakers), <b>IPC</b>, <b>MEL / CDL</b>, <b>FCOM</b>, <b>QRH</b> and <b>FCTM</b>, engine manufacturer data (CFM / Pratt &amp; Whitney), and your company procedures: company <b>QRH</b>, Operations Manual, Maintenance Control / MOE procedures and approved Engineering instructions.</li>
         <li><b>In flight</b>, the flight crew follows ECAM, QRH and FCOM and the operator&#39;s circuit breaker reset policy. Nothing on this site permits or recommends a reset.</li>
         <li><b>On ground</b>, troubleshooting, resets and return to service must be carried out and certified by appropriately authorised staff in accordance with approved data and your organisation&#39;s procedures.</li>
-        <li><b>Data may be incomplete, out of date or wrong.</b> C/B FINs, designations, panel locations and effectivity were compiled from a single LEAP-1A powered A320neo and may not match your aircraft (MSN, modification status, engine type). Reset sequences are educational summaries based on TSM chapter 24 rules and must be checked against your current TSM. ECAM-to-C/B and P/B links are automatically generated drafts and have not been validated.</li>
-        <li><b>Your entries stay on your device.</b> Procedures and comments you add are stored only in this browser. They are not reviewed, not approved and not shared with anyone.</li>
+        <li><b>Data may be incomplete, out of date or wrong.</b> C/B FINs, designations, panel locations and effectivity were compiled from a single LEAP-1A powered A320neo and may not match your aircraft (MSN, modification status, engine type). Reset guidance is written by us from general line-maintenance practice and must be checked against your current TSM. ECAM-to-C/B, P/B and MMEL links are automatically generated drafts and have not been validated; MMEL references point to the public FAA MMEL (A318–A321, Rev 30 draft).</li>
+        <li><b>Comments and likes are public.</b> Comments and 👍 likes are shared with all users of this site and are not reviewed or approved. Do not post personal, company-confidential or copyrighted material. Changes you make to a reset procedure are stored only in your own browser.</li>
+        <li><b>Our own content.</b> All explanations, reset guidance, panel drawings and texts on this site are written and drawn by ECAM Reset Assist. They do not reproduce Airbus, airline or third-party documentation.</li>
         <li><b>No affiliation.</b> This site is independent and is not affiliated with, endorsed by or supported by Airbus, CFM International, Pratt &amp; Whitney, any airline or any authority. All trademarks belong to their owners; aircraft photo for illustration only.</li>
         <li><b>No warranty, no liability.</b> Provided “as is”. You use it at your own risk; to the extent permitted by law, the author accepts no liability for any decision, action, damage or loss resulting from its use.</li>
       </ol>
@@ -844,7 +846,7 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
 <div id="app" class="hidden">
   <div class="hero photo"><div class="in">
 
-    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.42 · education only</span></h1>
+    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.43 · education only</span></h1>
       <p>A320neo · ECAM alert → circuit breaker reset study aid · not approved maintenance data</p></div>
     <div class="user">For education and training only<br><button id="logout">Disclaimer</button></div>
   </div></div>
@@ -893,9 +895,9 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
       <div class="card">
         <div class="hd"><span id="cbtitle">C/B LIST</span><span id="cbcount"></span></div>
         <details class="cbinfo" open><summary>Location of the C/B panels</summary><ul>
-          <li><b>49VU</b> overhead panel (cockpit)</li><li><b>121VU</b> and <b>122VU</b> cockpit rear panels; <b>123VU, 124VU, 125VU</b> further rear panel / equipment racks</li>
-          <li><b>105VU</b> RH avionics compartment · <b>106VU</b> LH avionics compartment</li><li><b>2000VU</b> forward galley · <b>2001VU</b> aft galley (cabin)</li></ul>
-          <div class="muted" style="font-size:11.5px">A C/B protects its circuit by opening automatically on overload or short circuit. Public C/B lists contain duplicates, blank positions and inconsistent names, so always verify FIN and position against the current documentation for your aircraft.</div></details>
+          <li><b>Cockpit, overhead:</b> 49VU</li><li><b>Cockpit, behind the pilots:</b> 121VU (F/O side) and 122VU (captain side); 123VU, 124VU and 125VU sit further aft on the rear panels and racks</li>
+          <li><b>Avionics bay:</b> 105VU on the right, 106VU on the left</li><li><b>Cabin galleys:</b> 2000VU forward, 2001VU aft</li></ul>
+          <div class="muted" style="font-size:11.5px">Tip: a C/B pops out when its circuit draws too much current, so a tripped one is a symptom, not just a switch. Panel layouts and labels vary between aircraft – always confirm the FIN and grid position on your own aircraft before pulling anything.</div></details>
         <div class="pwbar" id="cpwbar" style="display:none;margin:10px 10px 0">⚠ No PW1100G-JM C/B source loaded. All rows below come from a LEAP-1A aircraft. Engine-related rows are likely to differ; every other row is PW applicability unverified.</div>
         <div style="padding:10px" class="row3">
           <input id="cq" placeholder="Search designation, FIN, location…">
@@ -932,7 +934,8 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
         <div class="body muted" style="font-size:12px" id="cm-note">Comments are stored only in this browser. Every procedure change is logged here with its comment (✎ CHANGE). Click a comment to open its ECAM reset.</div>
       </div>
     </section>
-  </main>
+    <footer class="ownfoot">© 2026 ECAM Reset Assist · education and training only · independent, not affiliated with Airbus, CFM or any airline</footer>
+</main>
 </div>
 
 <div class="modal hidden" id="cdlg"><div class="box">
@@ -1013,43 +1016,38 @@ if(!store.get('era_demo_v1',false)){ // example procedures (editable)
 
 // ---- reset sequences and conditions per system (educational, based on TSM chapter 24 rules) ----
 const REF_SRC={};
-const REF_GENERAL=[
- 'A reset (recycling) means switching a system off and on again to recover a function lost after an electrical transient or intermittent failure (TSM chapter 24 rules).',
- 'A reset is not the same as re-engaging a tripped C/B: a tripped C/B indicates overcurrent and can mean a real fault.',
- 'If the alert clearly followed an electrical power-up or transient, the reset can be done per the TSM for that computer.',
- 'Otherwise check the fault history first: reset only if the same computer alert did not trigger on previous flights.',
- 'Record the reset in the technical log, successful or not, where the procedure requires it.'];
-const REF_METHOD=['Cockpit control: OFF → wait about 3 s → ON → wait about 3 s for the reset to complete.','Circuit breaker: open (pull) → wait about 5 s unless stated otherwise → close (push) → wait about 3 s.'];
-// [regex, system, conditions[], steps[], C/B refs [panel,loc] or 'FIN']
+const REF_GENERAL=["Think of a reset as a controlled restart: you power a system down and up to clear a fault caused by a power transient or an intermittent glitch.", "A tripped C/B is a different story – it tripped because of overcurrent, so treat it as a possible real fault, not as something to simply push back in.", "Reset straight away when the alert clearly came with a power change (e.g. switching to or from EXT PWR or APU).", "Otherwise look at the fault history first. If the same computer has complained on earlier flights, troubleshoot instead of resetting.", "Write every reset into the tech log when the procedure asks for it – the ones that failed as well as the ones that worked."];
+const REF_METHOD=["Pushbutton or switch: OFF, count 3 s, ON, then give it about 3 s to settle.", "Circuit breaker: pull, count 5 s (unless the task says otherwise), push back in, then allow about 3 s."];
 const REF_GUIDE=[
- [/^VENT (AVNCS|BLOWER|EXTRACT|SKIN)/,'AEVC (avionics ventilation)',[],['Open the AEVC C/B, wait 5 s, close.'],[['122VU','Y17']]],
- [/^CAB PR (SYS|LDG ELEV)/,'CPC (cabin pressure controller)',[],['CPC 1 or CPC 2: open the C/B, wait 5 s, close.'],[['49VU','D09'],['122VU','Y22']]],
- [/^AIR PACK 1\(2\) REGUL|^COND TRIM AIR/,'ACSC (pack regulation / trim air)',['Expect a small thrust increase, and vibration if the parking brake is set'],['Several C/Bs are opened in stages, then closed in reverse order after 5 s: follow the TSM sequence.'],[]],
- [/^AUTO FLT FCU/,'FCU',[],['FCU 1 or FCU 2: open the C/B, wait 5 s, close.','If the fault persists: open both FCU C/Bs for 7 min, close them within 5 s of each other, allow at least 30 s for the self test.','Afterwards check and reset FCU targets and baro references.'],[['49VU','B05'],['121VU','M21']]],
- [/^AUTO FLT FMGC|^NAV FM\//,'FMGC',['On ground with EXT PWR or APU GEN','Engines OFF gives a better chance of success'],['Set the FD of the affected side OFF.','Open the FMGC C/B for 10 s, close it.','Wait 1 min before re-engaging FD and AP. If it fails, retry with engines OFF.'],[['49VU','B02'],['121VU','M17']]],
- [/^AUTO FLT A\/THR OFF/,'A/THR',['No engine running for the basic case'],['No engine running: engage A/THR on the FCU, then disconnect it with the instinctive pb on the thrust levers.','At least one engine running: supply the aircraft from EXT PWR or APU, set ENG MASTERs OFF, then repeat.'],[]],
- [/^AUTO FLT FAC/,'FAC (incl. CAT 3 DUAL on SD)',[],['First try changing the AP in command.','If no success: FAC 1 and FAC 2 pb OFF, wait 3 s, ON.','Does not clear CAT 3 DUAL caused by an ADR or IR fault.'],[]],
- [/^COM CIDS/,'CIDS 1+2',['Allow about 4 min for normal operation after the reset'],['Multi-step C/B sequence with timed re-opening per TSM (includes 147RH / 146RH if installed).','Frozen FAP: reset the FAP C/Bs for 10 s.'],[['49VU','H01'],['121VU','Q14']]],
- [/^COM RMP/,'RMP',[],['Reset one RMP at a time: RMP ON/OFF switch OFF, wait 5 s, ON.'],[]],
- [/^COM SATCOM/,'SATCOM (SDU)',['No software reset from the MCDU'],['Open SDU C/B 102RV1, wait 5 s, close. SDU should be back in under 2 min.'],['102RV1']],
- [/^COM HF .*DATA/,'HF data link',[],['Pull the HF data C/B (HA14), wait 2 s, close.'],['HA14']],
- [/^SMOKE (DET FAULT|FWD CRG DET|AFT CRG DET|LAVATORY DET)|^AVIONICS SMOKE/,'SDCU / CIDS-SDF (smoke detection)',['Allow about 4 min for recovery'],['Open the four SDF C/Bs (49VU C05, C06 and 122VU T17, T18).','After 10 s close C05/C06 together, then T17/T18 within 2 s.','Lavatory and cargo smoke detection use the same sequence as a fallback.'],[['49VU','C06'],['49VU','C05'],['122VU','T17'],['122VU','T18']]],
- [/^F\/CTL ELAC (1 |2 )?PITCH/,'ELAC (pitch fault)',['Flight control surfaces clear of persons and equipment','Not if dispatched under an MMEL item for ELAC or SEC','One reset attempt only'],['Set pitch trim to 5 UP.','Affected ELAC pb OFF, wait 3 s, ON; wait 15 s.','Check pitch trim returns to 0 and do a flight control check.','Restore the other ELAC and set pitch trim for the take-off CG.'],[]],
- [/^F\/CTL (AIL SERVO|L\(R\) AIL)/,'ELAC (aileron servo)',['Flight control surfaces clear of persons and equipment','Not if more than one aileron actuator is amber on the F/CTL page, or under certain MMEL items','One reset attempt only'],['Cycle ELAC 1 and ELAC 2 in sequence with a flight control check between steps.'],[]],
- [/^F\/CTL (SPLR FAULT|SEC \d FAULT|GND SPLR)/,'SEC (spoiler fault)',['Flight control surfaces clear of persons and equipment','Not under certain MMEL items','One reset attempt only'],['SEC 1, then SEC 2, then SEC 3: pb OFF, wait 3 s, ON.','Do a flight control check.'],[]],
- [/^F\/CTL ELAC [12] FAULT/,'ELAC',['Flight control surfaces clear of persons and equipment'],['See ELAC pitch / aileron reset guidance; one attempt only.'],[]],
- [/^FUEL (FQI|AUTO (FEED|TRANSFER)|CTR .*XFR|L\(R\) OUTER XFR|F\.USED)/,'FQIC (fuel quantity / transfer)',['Fuel quantity indication returns after about 1 min'],['Open the three FQI C/Bs, wait 5 s, close.'],[['49VU','A13'],['121VU','M27'],['121VU','L26']]],
- [/^ANTI ICE L\(R\) WINDOW/,'WHC (window heat)',['If packs are OFF with OAT above 40 °C or in direct sunlight: set both packs ON first and wait 5 min'],['Reset WHC 1 or WHC 2 C/B.'],[['122VU','X13'],['122VU','W13']]],
- [/^FWS FWC/,'FWC',['Allow 50 s after closing the C/B'],['FWC 1 or FWC 2: open the C/B, close it.'],[['49VU','F01'],['121VU','Q07']]],
- [/^L\/G LGCIU/,'LGCIU',['Probe covers removed','Green HYD depressurised (ENG 1 pump OFF, PTU OFF)'],['LGCIU 1: reset 121VU Q34 and 49VU C09. LGCIU 2: reset 121VU Q35.','Restore green HYD (ENG 1 pump ON, PTU AUTO).'],[['121VU','Q34'],['49VU','C09'],['121VU','Q35']]],
- [/^WHEEL N\/W STRG|^BRAKES-N\/WS MINOR|^BRAKES A\/SKID N\/WS FAULT/,'BSCU (nose wheel steering)',['Reset only if the fault appeared after engine start, the memo was shown before pushback and it remained after pushback; otherwise troubleshoot before flight','Aircraft stopped, parking brake ON, towing bar disconnected'],['A/SKID & N/W STRG switch OFF, then ON.','Check brake efficiency and that the aircraft does not veer. Record the reset.'],[]],
- [/^BRAKES (SYS [12] FAULT|NORM BRK FAULT|AUTO BRK FAULT)/,'BSCU (brakes)',['Aircraft stopped, parking brake ON, towing bar disconnected'],['A/SKID & N/W STRG switch OFF, then ON.','If unsuccessful: C/B sequence on 121VU M33, M34, M36.','Check brake efficiency. Record the reset.'],[['121VU','M33'],['121VU','M34'],['121VU','M36']]],
- [/^NAV BKUP/,'ISIS (standby instrument)',['Aircraft stationary'],['Open the ISIS C/B, wait 5 s, close. Normal operation after about 2 min.','If the aircraft moved slightly: press RST pb for 2 s and wait 2 min.'],[['49VU','F12']]],
- [/^NAV TCAS|^AUTO FLT TCAS/,'TCAS',[],['Open the applicable TCAS C/B, wait 5 s, close (check which one is installed).'],[['121VU','K07'],'1004SG']],
- [/^NAV GPWS/,'GPWS / terrain',[],['Open C/B 3WZ, set GPWS SYS and GPWS TERR pbs ON, close the C/B after 5 s.'],['3WZ']],
- [/^AIR ENG 1\(2\) BLEED (FAULT|ABNORM PR)/,'Engine bleed',['Only if the non-affected pack is operating and wing anti-ice is OFF'],['Affected ENG BLEED pb OFF; wait until the FAULT light goes out.','X BLEED AUTO, affected PACK ON, affected ENG BLEED ON; check the valve open on the BLEED page.','If the alert comes back: ENG BLEED OFF and X BLEED OPEN. Record the reset.'],[]],
- [/^AIR ENG 1\(2\) BLEED NOT CLSD/,'Engine bleed (not closed)',[],['Affected ENG BLEED pb OFF (wait for any FAULT light to clear), then ON.','Check the valve closed on the BLEED page. Record the reset.'],[]],
- [/^DATA LINK (ATSU|ATC|COMPANY)/,'ATSU',['Only if the DCDU shows invalid data, keys have no effect, or ADS-C / CPDLC / AOC is inoperative'],['Open 121VU L16, then L15; wait 5 s; close L15, then L16.'],[['121VU','L16'],['121VU','L15']]]];
+ [/^VENT (AVNCS|BLOWER|EXTRACT|SKIN)/,"Avionics ventilation computer (AEVC)",[],["Cycle the AEVC supply: C/B out, count 5 s, C/B in.", "Watch the VENT indications recover before you close the case."],[["122VU", "Y17"]]],
+ [/^CAB PR (SYS|LDG ELEV)/,"Cabin pressure controller (CPC)",[],["Work on one controller only – CPC 1 or CPC 2, whichever is reported.", "C/B out, count 5 s, C/B in, then confirm the CAB PRESS page is back to normal."],[["49VU", "D09"], ["122VU", "Y22"]]],
+ [/^AIR PACK 1\(2\) REGUL|^COND TRIM AIR/,"Air conditioning system controller (ACSC)",["Engines may spool up slightly during the reset; with parking brake set you may feel some vibration – this is expected"],["This one is a staged C/B sequence: several C/Bs come out one after the other and go back in reverse order after about 5 s.", "Because the order matters, take the exact sequence from the current TSM task before you start."],[]],
+ [/^AUTO FLT FCU/,"Flight control unit (FCU)",[],["Start simple: cycle only the reported FCU channel (C/B out 5 s, then in).", "Still faulty? Pull both FCU C/Bs and leave them out for about 7 minutes. Push them back in close together (within ~5 s) and give the FCU at least 30 s to finish its self test.", "When it is back, re-check speed/heading/altitude targets and both baro settings – they may have reset."],[["49VU", "B05"], ["121VU", "M21"]]],
+ [/^AUTO FLT FMGC|^NAV FM\//,"Flight management guidance computer (FMGC)",["Aircraft powered from EXT PWR or APU GEN", "Better chance of success with both engines shut down"],["Switch the flight director on the affected side OFF first.", "Pull the FMGC C/B, leave it out for about 10 s, push it back in.", "Give the system a full minute before you bring FD and AP back. If the first try fails, repeat with the engines shut down."],[["49VU", "B02"], ["121VU", "M17"]]],
+ [/^AUTO FLT A\/THR OFF/,"Autothrust (A/THR)",["Easiest with no engine running"],["Engines shut down: arm A/THR on the FCU, then knock it off with the instinctive disconnect pb on the thrust levers – that cycle clears the logic.", "If an engine is running: move to EXT PWR or APU, set the ENG MASTER switches OFF and repeat the same cycle."],[]],
+ [/^AUTO FLT FAC/,"Flight augmentation computers (FAC)",[],["Quick check first: swap the autopilot in command and see if the alert clears.", "If not, cycle FAC 1 and FAC 2 pushbuttons together: OFF, 3 s, ON.", "Note: a CAT 3 DUAL downgrade that comes from an ADR or IR problem will not be cured by this – fix the ADIRS side instead."],[]],
+ [/^COM CIDS/,"Cabin intercommunication data system (CIDS)",["Give the system around 4 minutes to come fully back after the reset"],["CIDS uses a timed, multi-step C/B sequence (on some aircraft it also includes 147RH / 146RH) – follow the TSM task step by step.", "If only the FAP screen is frozen, a 10 s reset of the FAP C/Bs is usually enough."],[["49VU", "H01"], ["121VU", "Q14"]]],
+ [/^COM RMP/,"Radio management panel (RMP)",[],["Never reset both panels at once – do one RMP, check it, then the other if needed.", "RMP switch OFF, count 5 s, back ON, and confirm the frequencies are still correct."],[]],
+ [/^COM SATCOM/,"Satellite communication (SDU)",["There is no MCDU software reset for this unit – it has to be the C/B"],["Cycle the SDU C/B 102RV1: out, 5 s, in.", "The SDU normally logs back on within about 2 minutes."],["102RV1"]],
+ [/^COM HF .*DATA/,"HF data link",[],["A short cycle is enough: HF data C/B HA14 out, 2 s, in."],["HA14"]],
+ [/^SMOKE (DET FAULT|FWD CRG DET|AFT CRG DET|LAVATORY DET)|^AVIONICS SMOKE/,"Smoke detection (SDCU / CIDS-SDF)",["Expect up to about 4 minutes before the detection loops are fully back"],["Pull all four SDF C/Bs: 49VU C05 and C06, 122VU T17 and T18.", "After about 10 s push C05 and C06 back in together, then T17 and T18 together within 2 s.", "The same sequence is the fallback for lavatory and cargo smoke-detection faults."],[["49VU", "C06"], ["49VU", "C05"], ["122VU", "T17"], ["122VU", "T18"]]],
+ [/^F\/CTL ELAC (1 |2 )?PITCH/,"ELAC – pitch",["Surfaces clear – nobody and nothing near the flight controls", "Do not reset if the aircraft is already dispatched under an MMEL item for ELAC or SEC", "You get one attempt – if it comes back, troubleshoot"],["Trim the THS to 5° UP.", "Cycle the affected ELAC pushbutton: OFF, 3 s, ON, then wait about 15 s.", "The trim should run back to 0 by itself – then carry out a flight control check.", "Finish by restoring the other ELAC and setting the trim for the take-off CG."],[]],
+ [/^F\/CTL (AIL SERVO|L\(R\) AIL)/,"ELAC – aileron servo",["Surfaces clear – nobody and nothing near the flight controls", "Do not reset with more than one aileron actuator shown amber on the F/CTL page, or when certain MMEL items apply", "One attempt only"],["Cycle ELAC 1, do a flight control check, then cycle ELAC 2 and check again – one computer at a time."],[]],
+ [/^F\/CTL (SPLR FAULT|SEC \d FAULT|GND SPLR)/,"SEC – spoilers",["Surfaces clear – nobody and nothing near the flight controls", "Not when certain MMEL items apply", "One attempt only"],["Cycle the SECs in order 1 → 2 → 3, each one OFF, 3 s, ON.", "Finish with a flight control check."],[]],
+ [/^F\/CTL ELAC [12] FAULT/,"ELAC",["Surfaces clear – nobody and nothing near the flight controls"],["Use the ELAC pitch or aileron guidance above, depending on what the F/CTL page shows. One attempt only."],[]],
+ [/^FUEL (FQI|AUTO (FEED|TRANSFER)|CTR .*XFR|L\(R\) OUTER XFR|F\.USED)/,"Fuel quantity indicating computer (FQIC)",["Fuel quantities take about a minute to come back after the reset"],["Pull the three FQI C/Bs together, wait 5 s, push them back in."],[["49VU", "A13"], ["121VU", "M27"], ["121VU", "L26"]]],
+ [/^ANTI ICE L\(R\) WINDOW/,"Window heat computer (WHC)",["Hot day (OAT above about 40 °C, or the aircraft in direct sun) with packs OFF: run both packs for 5 minutes before you reset"],["Cycle the C/B of the affected computer – WHC 1 or WHC 2."],[["122VU", "X13"], ["122VU", "W13"]]],
+ [/^FWS FWC/,"Flight warning computer (FWC)",["The FWC needs about 50 s to restart after the C/B is back in"],["Cycle the reported FWC (1 or 2): C/B out, then in."],[["49VU", "F01"], ["121VU", "Q07"]]],
+ [/^L\/G LGCIU/,"Landing gear control interface unit (LGCIU)",["Probe covers off", "Green hydraulics depressurised: ENG 1 pump OFF and PTU OFF"],["LGCIU 1: cycle 121VU Q34 and 49VU C09.  LGCIU 2: cycle 121VU Q35.", "Put green hydraulics back afterwards: ENG 1 pump ON, PTU to AUTO."],[["121VU", "Q34"], ["49VU", "C09"], ["121VU", "Q35"]]],
+ [/^WHEEL N\/W STRG|^BRAKES-N\/WS MINOR|^BRAKES A\/SKID N\/WS FAULT/,"BSCU – nose wheel steering",["Reset only if the fault showed after engine start, the memo was already on before pushback and is still there afterwards – any other pattern needs troubleshooting before flight", "Aircraft stopped, parking brake ON, tow bar disconnected"],["Cycle the A/SKID & N/W STRG switch: OFF, then ON.", "Taxi check: brakes effective and the aircraft tracks straight. Log the reset."],[]],
+ [/^BRAKES (SYS [12] FAULT|NORM BRK FAULT|AUTO BRK FAULT)/,"BSCU – brakes",["Aircraft stopped, parking brake ON, tow bar disconnected"],["First try the A/SKID & N/W STRG switch: OFF, then ON.", "No luck? Use the C/B sequence on 121VU M33, M34 and M36.", "Check braking works properly and log the reset."],[["121VU", "M33"], ["121VU", "M34"], ["121VU", "M36"]]],
+ [/^NAV BKUP/,"Standby instrument (ISIS)",["Aircraft must not move during the reset"],["Cycle the ISIS C/B: out, 5 s, in. Allow about 2 minutes for it to align.", "If the aircraft moved a little during alignment: hold the RST pb for 2 s and wait another 2 minutes."],[["49VU", "F12"]]],
+ [/^NAV TCAS|^AUTO FLT TCAS/,"TCAS",[],["Check which TCAS C/B your aircraft has, then cycle it: out, 5 s, in."],[["121VU", "K07"], "1004SG"]],
+ [/^NAV GPWS/,"GPWS / terrain",[],["Pull C/B 3WZ, make sure GPWS SYS and GPWS TERR pushbuttons are ON, and push the C/B back in after about 5 s."],["3WZ"]],
+ [/^AIR ENG 1\(2\) BLEED (FAULT|ABNORM PR)/,"Engine bleed",["Only with the pack on the other side running and wing anti-ice OFF"],["Affected ENG BLEED pb OFF and wait for the FAULT light to go out.", "Set X BLEED to AUTO, affected PACK ON, then the ENG BLEED back ON – confirm the valve shows open on the BLEED page.", "If the alert returns, leave ENG BLEED OFF with X BLEED OPEN, and log it."],[]],
+ [/^AIR ENG 1\(2\) BLEED NOT CLSD/,"Engine bleed – valve not closed",[],["Affected ENG BLEED pb OFF (let any FAULT light clear), then ON again.", "Confirm on the BLEED page that the valve now closes, and log the reset."],[]],
+ [/^DATA LINK (ATSU|ATC|COMPANY)/,"Air traffic services unit (ATSU)",["Worth trying when the DCDU shows invalid data, its keys do nothing, or ADS-C / CPDLC / AOC stops working"],["Pull 121VU L16 first, then L15. Wait 5 s. Push L15 back in first, then L16."],[["121VU", "L16"], ["121VU", "L15"]]]
+];
 const refOf=a=>REF_GUIDE.filter(g=>g[0].test(a.t));
 const refCbs=g=>g[4].map(r=>Array.isArray(r)?{ref:r[0]+' '+r[1],c:CB.find(c=>c.panel===r[0]&&c.loc===r[1])}:{ref:r,c:CB.find(c=>c.fin===r)});
 const refFins=a=>[...new Set(refOf(a).flatMap(g=>refCbs(g).filter(x=>x.c).map(x=>x.c.fin)))];
