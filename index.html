@@ -16,6 +16,9 @@
 body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"zero" 0}
 *{font-feature-settings:"tnum" 1,"zero" 0}
 html{overflow-y:scroll;scrollbar-gutter:stable}
+.livebadge{font-size:10.5px;letter-spacing:.3px;margin-left:8px;padding:1px 7px;border-radius:10px;border:1px solid var(--line);color:var(--muted,#8a94a0);font-weight:500;text-transform:none}
+.livebadge.ok{color:#14833b;border-color:#9fd8b1;background:#eefaf2}
+.livebadge.err{color:#b45309;border-color:#f3c98b;background:#fff7ea}
 .mmelrow{display:flex;flex-wrap:wrap;gap:8px}
 .mmelchip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:6px;padding:6px 10px;background:var(--panel2);font-size:13px;cursor:default}
 .mmelchip .mn{color:var(--blue)}
@@ -760,7 +763,7 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
 <div id="app" class="hidden">
   <div class="hero photo"><div class="in">
 
-    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.40 · education only</span></h1>
+    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.41 · education only</span></h1>
       <p>A320neo · ECAM alert → circuit breaker reset study aid · not approved maintenance data</p></div>
     <div class="user">For education and training only<br><button id="logout">Disclaimer</button></div>
   </div></div>
@@ -887,7 +890,7 @@ function editWithComment(what,aid,P,eng,apply){
     if(!t){ $('#edlg-e').textContent='Write a comment explaining the change.'; $('#edlg-t').focus(); return; }
     if(!n){ $('#edlg-e').textContent='Name or nickname is required.'; $('#edlg-n').focus(); return; }
     store.set('era_name',n); apply();
-    (CMTS[aid+'|'+P]=CMTS[aid+'|'+P]||[]).push({id:'c'+Date.now(),text:t,name:n,eng,edit:what,ts:new Date().toISOString()}); saveCmts();
+    cmtAdd(aid+'|'+P,{id:'c'+Date.now(),text:t,name:n,eng,edit:what,ts:new Date().toISOString()}).then(()=>{renderDetail(); renderAlerts();});
     $('#edlg').classList.add('hidden'); toast('Change saved with comment'); renderDetail(); renderAlerts(); };
 }
 function askConfirm(title,msg,onYes){ $('#cdlg-t').textContent=title; $('#cdlg-m').textContent=msg; $('#cdlg').classList.remove('hidden');
@@ -1022,6 +1025,42 @@ let LIKES=store.get('era_likes',{}); // alertId|G/F -> [names]
 const likesOf=(id,P)=>LIKES[id+'|'+P]||[];
 const likeCount=id=>likesOf(id,'G').length+likesOf(id,'F').length;
 const saveLikes=()=>store.set('era_likes',LIKES);
+/* ---- shared comments & likes (Supabase). Empty URL/KEY = local-only mode ---- */
+const SB_URL='__SB_URL__', SB_KEY='__SB_KEY__';
+const LIVE={on:false,ok:false,sb:null};
+const devToken=(()=>{let t=store.get('era_dev','');if(!t){t=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now());store.set('era_dev',t);}return t;})();
+let MY_CMTS=store.get('era_my_cmts',[]);
+const isMine=c=>!LIVE.on||MY_CMTS.includes(c.id);
+function liveBadge(){return LIVE.on?(LIVE.ok?'<span class="livebadge ok" title="Comments and likes are shared with everybody in real time">● LIVE · shared</span>':'<span class="livebadge" title="Connecting to the shared database…">● connecting…</span>'):'<span class="livebadge off" title="Saved in this browser only">● local only</span>';}
+function liveRefreshUI(){try{renderAlerts();}catch(e){} try{if(state.alert&&state.view==='assist')renderDetailKeep();}catch(e){} try{if(state.view==='log')renderLog();}catch(e){} document.querySelectorAll('.livebadge-slot').forEach(x=>x.innerHTML=liveBadge());}
+function renderDetailKeep(){const t=document.activeElement, id=t&&t.id, v=id&&t.value, ss=t&&t.selectionStart; if(id==='cm-txt'||id==='cm-name'||id==='edlg-t'||id==='edlg-n'){const keep={txt:$('#cm-txt')?.value,nm:$('#cm-name')?.value}; renderDetail(); if($('#cm-txt'))$('#cm-txt').value=keep.txt||''; if($('#cm-name'))$('#cm-name').value=keep.nm||''; const e=document.getElementById(id); if(e){e.focus(); try{e.setSelectionRange(ss,ss)}catch(_){}}} else renderDetail();}
+async function liveLoad(){const sb=LIVE.sb;
+  const [c,l]=await Promise.all([sb.from('era_comments').select('id,akey,name,text,eng,edit,created_at').order('created_at',{ascending:true}).limit(5000),sb.from('era_likes').select('akey,name').order('created_at',{ascending:true}).limit(20000)]);
+  if(c.error||l.error) throw (c.error||l.error);
+  const C={}; c.data.forEach(r=>{(C[r.akey]=C[r.akey]||[]).push({id:r.id,text:r.text,name:r.name,eng:r.eng||'',edit:r.edit||'',ts:r.created_at});});
+  const L={}; l.data.forEach(r=>{(L[r.akey]=L[r.akey]||[]).push(r.name);});
+  CMTS=C; LIKES=L; LIVE.ok=true; liveRefreshUI();}
+let liveT=null; const liveSoon=()=>{clearTimeout(liveT); liveT=setTimeout(()=>liveLoad().catch(liveErr),250);};
+function liveErr(e){console.warn('live sync',e); LIVE.ok=false; document.querySelectorAll('.livebadge-slot').forEach(x=>x.innerHTML='<span class="livebadge err" title="'+esc(String(e&&e.message||e))+'">● offline · retrying</span>');}
+function liveInit(){ if(!/^https:\/\//.test(SB_URL)||SB_KEY.length<20) return; LIVE.on=true;
+  const sc=document.createElement('script'); sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; sc.onerror=()=>liveErr('Could not load the Supabase library');
+  sc.onload=()=>{ LIVE.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false}});
+    liveLoad().catch(liveErr);
+    LIVE.sb.channel('era-live').on('postgres_changes',{event:'*',schema:'public',table:'era_comments'},liveSoon).on('postgres_changes',{event:'*',schema:'public',table:'era_likes'},liveSoon).subscribe();
+    setInterval(()=>liveLoad().catch(liveErr),60000); document.addEventListener('visibilitychange',()=>{if(!document.hidden)liveSoon();}); };
+  document.head.appendChild(sc);}
+async function cmtAdd(key,c){ if(!LIVE.on){(CMTS[key]=CMTS[key]||[]).push(c); saveCmts(); return true;}
+  const r=await LIVE.sb.rpc('era_add_comment',{p_akey:key,p_name:c.name,p_text:c.text,p_eng:c.eng||'',p_edit:c.edit||'',p_token:devToken});
+  if(r.error){toast('Comment not saved: '+r.error.message); return false;}
+  MY_CMTS.push(r.data); store.set('era_my_cmts',MY_CMTS); (CMTS[key]=CMTS[key]||[]).push({...c,id:r.data}); liveSoon(); return true;}
+async function cmtDel(key,id){ if(!LIVE.on){CMTS[key]=(CMTS[key]||[]).filter(c=>c.id!==id); saveCmts(); return true;}
+  const r=await LIVE.sb.rpc('era_delete_comment',{p_id:id,p_token:devToken});
+  if(r.error||!r.data){toast('Only the author’s browser can delete this comment'); return false;}
+  CMTS[key]=(CMTS[key]||[]).filter(c=>c.id!==id); liveSoon(); return true;}
+async function likeToggle(key,nm){ if(!LIVE.on){const L=LIKES[key]=LIKES[key]||[], i=L.findIndex(n=>n.toLowerCase()===nm.toLowerCase()); if(i>=0)L.splice(i,1); else L.push(nm); if(!L.length) delete LIKES[key]; saveLikes(); return i<0;}
+  const r=await LIVE.sb.rpc('era_toggle_like',{p_akey:key,p_name:nm});
+  if(r.error){toast('Like not saved: '+r.error.message); return null;}
+  const L=LIKES[key]=LIKES[key]||[], i=L.findIndex(n=>n.toLowerCase()===nm.toLowerCase()); if(r.data){if(i<0)L.push(nm);} else if(i>=0)L.splice(i,1); liveSoon(); return r.data;}
 function likeHtml(a,P){const L=likesOf(a.id,P), me=(store.get('era_name','')||'').trim().toLowerCase(), mine=me&&L.some(n=>n.toLowerCase()===me);
   return `<div class="likebar"><button class="b likebtn ${mine?'on':''}" id="like-btn" title="${L.length?esc(L.join(', ')):'Be the first to like this reset procedure'}">👍 ${mine?'Liked':'Like'} · ${L.length}</button><span class="muted" style="font-size:11.5px">${L.length?'Liked by '+esc(L.slice(-3).join(', '))+(L.length>3?` +${L.length-3}`:''):'Was this reset procedure useful?'}</span></div>`;}
 
@@ -1225,8 +1264,8 @@ function renderDetail(){
 
      ${mmelHtml(a)}
 
-     <div class="step">💡 COMMENTS · ${inFlt?'IN-FLIGHT':'ON-GROUND'} RESET (${cmts.length})</div>
-     ${cmts.length?cmts.map(c=>`<div class="cmt"><a href="#" class="xdel" style="float:right" data-delcmt="${esc(c.id)}" title="Delete comment">✕</a>${c.edit?`<div class="cedit">✎ CHANGE: ${esc(c.edit)}</div>`:''}<div style="white-space:pre-wrap">${esc(c.text)}</div><div class="m"><span class="ctag e">${esc(c.eng||'')}</span>${c.name?esc(c.name)+' · ':''}${c.ts.slice(0,16).replace('T',' ')} UTC</div></div>`).join(''):'<div class="muted" style="font-size:12px">No comments yet.</div>'}
+     <div class="step">💡 COMMENTS · ${inFlt?'IN-FLIGHT':'ON-GROUND'} RESET (${cmts.length}) <span class="livebadge-slot">${liveBadge()}</span></div>
+     ${cmts.length?cmts.map(c=>`<div class="cmt">${isMine(c)?`<a href="#" class="xdel" style="float:right" data-delcmt="${esc(c.id)}" title="Delete comment">✕</a>`:''}${c.edit?`<div class="cedit">✎ CHANGE: ${esc(c.edit)}</div>`:''}<div style="white-space:pre-wrap">${esc(c.text)}</div><div class="m"><span class="ctag e">${esc(c.eng||'')}</span>${c.name?esc(c.name)+' · ':''}${c.ts.slice(0,16).replace('T',' ')} UTC</div></div>`).join(''):'<div class="muted" style="font-size:12px">No comments yet.</div>'}
      <div style="margin-top:6px"><textarea id="cm-txt" rows="2" placeholder="Add a comment to this reset (experience, tips, references)…"></textarea>
        <div style="display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:6px"><input id="cm-name" placeholder="Your name or nickname *" value="${esc(store.get('era_name',''))}"><button class="b p" id="cm-add">💡 Add comment</button></div></div>
 
@@ -1256,13 +1295,13 @@ function renderDetail(){
     EC('Linked C/B '+hit.fin+' ('+hit.des+')',()=>{LINKS[a.id]=[...new Set([...(LINKS[a.id]||[]),hit.fin])]; H.cb=H.cb.filter(x=>x!==hit.fin); store.set('mcc_hide',HIDE); store.set('mcc_links',LINKS);});};
   document.querySelectorAll('[data-unlink]').forEach(x=>x.onclick=e=>{e.preventDefault();EC('Removed C/B link '+x.dataset.unlink,()=>{LINKS[a.id]=(LINKS[a.id]||[]).filter(y=>y!==x.dataset.unlink);store.set('mcc_links',LINKS);});});
   const me=(u=>u.name?u.name+' ('+u.id+')':u.id)(curUser());
-  document.querySelectorAll('[data-delcmt]').forEach(x=>x.onclick=e=>{e.preventDefault();askConfirm('Delete comment?','Do you really want to delete this comment?',()=>{CMTS[a.id+'|'+P]=cmtsOf(a.id,P).filter(c=>c.id!==x.dataset.delcmt);saveCmts();toast('Comment deleted');renderDetail();renderAlerts();});});
+  document.querySelectorAll('[data-delcmt]').forEach(x=>x.onclick=e=>{e.preventDefault();askConfirm('Delete comment?','Do you really want to delete this comment?',()=>{cmtDel(a.id+'|'+P,x.dataset.delcmt).then(ok=>{if(ok)toast('Comment deleted');renderDetail();renderAlerts();});});});
   $('#like-btn').onclick=()=>{let nm=(($('#cm-name')&&$('#cm-name').value)||store.get('era_name','')).trim();
     if(!nm){toast('Enter your name or nickname (comment box below) to like');const i=$('#cm-name'); if(i){i.scrollIntoView({block:'center'});i.focus();} return;}
-    store.set('era_name',nm); const k=a.id+'|'+P, L=LIKES[k]=LIKES[k]||[], i=L.findIndex(n=>n.toLowerCase()===nm.toLowerCase());
-    if(i>=0){L.splice(i,1);toast('Like removed');} else {L.push(nm);toast('👍 Liked');} if(!L.length) delete LIKES[k]; saveLikes(); renderDetail(); renderAlerts();};
+    store.set('era_name',nm); $('#like-btn').disabled=true;
+    likeToggle(a.id+'|'+P,nm).then(r=>{if(r===true)toast('👍 Liked'); else if(r===false)toast('Like removed'); renderDetail(); renderAlerts();});};
   $('#cm-add').onclick=()=>{const v=$('#cm-txt').value.trim(), nm=$('#cm-name').value.trim(); if(!v){toast('Write a comment first');$('#cm-txt').focus();return;} if(!nm){toast('Name or nickname is required');$('#cm-name').focus();return;} store.set('era_name',nm);
-    (CMTS[a.id+'|'+P]=CMTS[a.id+'|'+P]||[]).push({id:'c'+Date.now(),text:v,name:nm,eng:f.engine,ts:new Date().toISOString()}); saveCmts(); toast('Comment added'); renderDetail(); renderAlerts();};
+    $('#cm-add').disabled=true; cmtAdd(a.id+'|'+P,{id:'c'+Date.now(),text:v,name:nm,eng:f.engine,ts:new Date().toISOString()}).then(ok=>{if(ok){toast('Comment added'); $('#cm-txt').value='';} renderDetail(); renderAlerts();});};
 }
 
 function noteAuthor(n){ return n.aname||n.aid?`${esc(n.aname||'')}${n.aid?` (${esc(n.aid)})`:''}`:esc(n.author||''); }
@@ -3503,7 +3542,7 @@ function renderLog(){
   const all=[]; Object.keys(CMTS).forEach(k=>{const [id,P]=k.split('|'), a=alertById(id); if(!a) return; (CMTS[k]||[]).forEach(c=>all.push({a,P,c}));});
   all.sort((x,y)=>y.c.ts.localeCompare(x.c.ts));
   const list=all.filter(({a,c})=>!q||[a.t,c.text,c.name,c.eng,c.edit].join(' ').toLowerCase().includes(q));
-  $('#cm-head').textContent=`💡 ALL COMMENTS · ${list.length}`;
+  $('#cm-head').innerHTML=`💡 ALL COMMENTS · ${list.length} <span class="livebadge-slot">${liveBadge()}</span>`;
   $('#cm-list').innerHTML=list.length?list.map(({a,P,c})=>`<button class="citem" data-ga="${a.id}" data-gp="${P}"><div><span class="ecam" style="font-size:12px;padding:2px 7px">${esc(a.t)}</span> <span class="ctag ${P==='F'?'f':''}">${P==='F'?'IN FLIGHT':'ON GROUND'}</span><span class="ctag e">${esc(c.eng||'')}</span><span class="muted" style="font-size:11.5px">ATA ${a.ata}</span></div>
      ${c.edit?`<div class="cedit" style="margin-top:5px">✎ CHANGE: ${esc(c.edit)}</div>`:''}<div style="white-space:pre-wrap;margin-top:5px;font-size:13px">${esc(c.text)}</div><div class="muted" style="font-size:11.5px;margin-top:3px">${c.name?esc(c.name)+' · ':''}${c.ts.slice(0,16).replace('T',' ')} UTC</div></button>`).join('')
     :'<div class="empty">No comments yet.<br>Open an ECAM alert and add a comment below its reset procedure.</div>';
@@ -3511,6 +3550,7 @@ function renderLog(){
     setTimeout(()=>document.querySelector('.aitem.on')?.scrollIntoView({block:'center'}),50);});
 }
 $('#cm-q').oninput=renderLog;
+setTimeout(liveInit,0);
 
 // ---- extra links for 49VU-area systems (auto-matched DRAFT, verify against TSM/AWM) ----
 [[/^COM CIDS/,['153RH','158RH','159RH','172RH','179RH']],
