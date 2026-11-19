@@ -1026,7 +1026,7 @@ const likesOf=(id,P)=>LIKES[id+'|'+P]||[];
 const likeCount=id=>likesOf(id,'G').length+likesOf(id,'F').length;
 const saveLikes=()=>store.set('era_likes',LIKES);
 /* ---- shared comments & likes (Supabase). Empty URL/KEY = local-only mode ---- */
-const SB_URL='__SB_URL__', SB_KEY='__SB_KEY__';
+const SB_URL='https://jyknframvdazpivsykbf.supabase.co', SB_KEY='sb_publishable_aWTJPk1OXZ5uB6aHnzUAhQ_qKznualv';
 const LIVE={on:false,ok:false,sb:null};
 const devToken=(()=>{let t=store.get('era_dev','');if(!t){t=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now());store.set('era_dev',t);}return t;})();
 let MY_CMTS=store.get('era_my_cmts',[]);
