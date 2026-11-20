@@ -23,6 +23,11 @@
 body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"zero" 0}
 *{font-feature-settings:"tnum" 1,"zero" 0}
 html{overflow-y:scroll;scrollbar-gutter:stable}
+.scopedlg{position:fixed;inset:0;z-index:60;background:rgba(8,18,45,.45);display:none;align-items:center;justify-content:center;padding:16px}
+.scopedlg.on{display:flex}
+.sd-box{background:#fff;border-radius:14px;max-width:420px;width:100%;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.3);display:grid;gap:10px}
+.sd-t{font-weight:700;font-size:16px;color:#0b1a4b}.sd-m{font-size:13px;color:#556}
+.sd-b{width:100%;min-height:44px;font-size:14px}.sd-c{background:none;border:0;color:#778;min-height:36px}
 #cbody tr,#detail table tbody tr{transition:background-color .12s;cursor:pointer}
 #cbody tr:hover td,#detail table tbody tr:hover td{background:#eaf3ff}
 #cbody tr.cbsel td,#detail table tbody tr.cbsel td{background:#cfe4ff}
@@ -35,7 +40,7 @@ html{overflow-y:scroll;scrollbar-gutter:stable}
  html,body{background:#0b1a4b}
  #app{background:var(--bg,#f3f5f8);min-height:100dvh}
 }
-/* ===== v1.51 iPhone redesign ===== */
+/* ===== v1.52 iPhone redesign ===== */
 .mbar{display:none}
 @media(max-width:700px){
  #detail{overflow:visible!important}
@@ -97,7 +102,7 @@ html{overflow-y:scroll;scrollbar-gutter:stable}
 
 .gonly{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;color:#1d4ed8;background:#eaf1ff;border:1px solid #c9dafc;border-radius:999px;padding:4px 10px}
 .ownfoot{margin:24px 0 8px;text-align:center;font-size:11px;color:var(--muted,#8a94a0)}
-/* ===== v1.51 iPhone / iPad ===== */
+/* ===== v1.52 iPhone / iPad ===== */
 nav .ni{display:none;font-style:normal}
 nav .ns{display:none}
 .mback{display:none}
@@ -919,7 +924,7 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
 <div id="app" class="hidden">
   <div class="hero photo"><div class="in">
 
-    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · A321neo · v1.51 · education only</span></h1>
+    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · A321neo · v1.52 · education only</span></h1>
       <p>A320neo / A321neo · ECAM alert → circuit breaker reset study aid · not approved maintenance data</p></div>
     <div class="user">For education and training only<br><button id="logout">Disclaimer</button></div>
   </div></div>
@@ -1143,7 +1148,20 @@ function refHtml(a,inFlt){
    ${seq.length?`<div class="refl">Reset sequence${gs.length?' · '+esc(gs.map(g=>g[1]).join(' / ')):''}</div><ol>${seq.map(x=>`<li>${esc(x).replace(/\{([0-9A-Z]+)\}/g,(m,f)=>'<b>'+posOf(f)+'</b>')}</li>`).join('')}</ol>`:`<div class="refl">Reset method (general)</div><ol>${REF_METHOD.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`}
    ${cbs.length?`<div class="refl">C/Bs named for this reset</div><table class="reft">${cbs.map(({ref,c})=>`<tr><td class="fin">${c?c.fin:esc(ref)}</td><td>${c?esc(c.des):'<span class="muted">not in this aircraft’s C/B sheet</span>'}</td><td class="loc">${c?c.panel+' '+c.loc:''}</td><td>${c?'':'<span class="pill pw-unverified">verify</span>'}</td></tr>`).join('')}</table>`:''}</div>`;
 }
-const finsOf=a=>[...new Set([...(a.fins||[]),...(a.auto||[]),...refFins(a),...(LINKS[a.id]||[])])];
+const acKey=()=>{try{return state.tail.reg}catch(e){return 'A320neo'}};
+const userFins=a=>[...(LINKS[a.id]||[]),...(LINKS[a.id+'@'+acKey()]||[])];
+const finsOf=a=>[...new Set([...(a.fins||[]),...(a.auto||[]),...refFins(a),...userFins(a)])];
+function askScope(what,cb){ const acs=FLEET.filter(t=>t.data).map(t=>t.type), cur=acKey();
+  if(acs.length<2){cb('ALL');return;}
+  let d=document.getElementById('scopedlg'); if(!d){ d=document.createElement('div'); d.id='scopedlg'; d.className='scopedlg'; document.body.appendChild(d); }
+  d.innerHTML=`<div class="sd-box"><div class="sd-t">Add ${esc(what)} for which aircraft?</div>
+    <div class="sd-m">Is the reset procedure the same on both types?</div>
+    <button class="b p sd-b" data-s="ALL">Both ${esc(acs.join(' and '))} – same procedure</button>
+    <button class="b sd-b" data-s="${esc(cur)}">Only ${esc(cur)} (selected aircraft)</button>
+    <button class="b sd-c" data-s="">Cancel</button></div>`;
+  d.classList.add('on');
+  d.querySelectorAll('button').forEach(b=>b.onclick=()=>{d.classList.remove('on'); if(b.dataset.s) cb(b.dataset.s);});
+  d.onclick=e=>{if(e.target===d) d.classList.remove('on');}; }
 // engine-option specific items (C/B data come from a LEAP-1A aircraft)
 const engCb=c=>/^(7\d|80)/.test(c.ata)||/^26-1/.test(c.ata)||(/^30-(2|3)/.test(c.ata)&&/ENG/.test(c.des));
 const engAlert=a=>/^(7\d|80)$/.test(a.ata)||/^ENG|FADEC|^AIR ENG|^ANTI ICE ENG|ENG ?\d?\(?\d?\)? ?(FIRE|ANTI ICE|BLEED|OIL|START|IGN|FUEL)/.test(a.t);
@@ -1310,7 +1328,7 @@ function cbRows(a,f,list,locked){
     const theirs=other?cbsFor(fin,other.fsn):[];
     return mine.map(c=>{const t=theirs[0];let diff='';
       if(other){ if(!t) diff=`Not on ${other.reg} (${other.fam})`; else if(t.des!==c.des||t.loc!==c.loc||t.panel!==c.panel) diff=`${other.reg}: ${esc(t.des)} @ ${t.panel} ${t.loc}`; }
-      const src=(LINKS[a.id]||[]).includes(fin)?'USER':'AUTO';
+      const src=(LINKS[a.id]||[]).includes(fin)?'USER':(LINKS[a.id+'@'+acKey()]||[]).includes(fin)?'USER · '+acKey()+' only':'AUTO';
       return `<tr><td class="fin">${c.fin}<span class="src">${src}</span></td><td>${esc(c.des)}${c.note?`<div class="diff">${esc(c.note)}</div>`:''}${pwCb(f)?`<div style="margin-top:3px">${pwTag(c)}</div>`:''}${diff?`<div class="diff">≠ ${diff}</div>`:''}</td><td class="loc">${c.panel}</td><td class="loc">${c.loc}${c.clip?' <span class="pill p-warn">CLIPPED</span>':''}</td><td>${locked?'':`<a href="#" data-delcb="${c.fin}" class="xdel" title="Delete C/B">✕</a>`}</td></tr>`}).join('');
   }).join('');
   return rows;
@@ -1322,7 +1340,7 @@ const pbById=id=>PB_DB.find(p=>p.id===id);
 function pbsOf(a,f){
   const auto=(a.pbs||[]).map(pbById).filter(p=>p&&pbFamOk(p.fam,f.fam))
     .map(p=>({id:'auto-'+p.id,dbid:p.id,name:p.name,panel:p.panel,action:'Per ECAM / QRH / TSM',phase:'Not set (verify)',fam:p.fam,note:[p.fn,p.note].filter(Boolean).join(' · '),src:'AUTO'}));
-  const mcc=(PBS[a.id]||[]).filter(p=>pbFamOk(p.fam,f.fam)).map(p=>Object.assign({src:'USER',dbid:(PB_DB.find(x=>x.name===p.name)||{}).id},p));
+  const mcc=(PBS[a.id]||[]).filter(p=>pbFamOk(p.fam,f.fam)&&(!p.ac||p.ac==='ALL'||p.ac===f.reg)).map(p=>Object.assign({src:p.ac&&p.ac!=='ALL'?'USER · '+p.ac+' only':'USER',dbid:(PB_DB.find(x=>x.name===p.name)||{}).id},p));
   return [...auto,...mcc];
 }
 // ---- aircraft condition for reset (DRAFT, generic A320 practice; verify vs AMM/TSM) ----
@@ -1371,7 +1389,7 @@ function backToList(){const id=state.alert;state.alert=null;renderAlerts();rende
 document.addEventListener('click',e=>{const b=e.target.closest('#mback');if(b){e.preventDefault();backToList();}
   const bn=e.target.closest('#banner');if(bn&&!e.target.closest('a'))bn.classList.toggle('open');});
 
-/* ===== v1.51 iPhone: sticky bar, collapsible sections, edit mode ===== */
+/* ===== v1.52 iPhone: sticky bar, collapsible sections, edit mode ===== */
 let M_EDIT=false; const M_OPEN=(()=>{try{return JSON.parse(sessionStorage.getItem('era_msec')||'{}')}catch(e){return {}}})();
 function phoneEnhance(){ const d=document.getElementById('detail'); if(!d) return;
   document.body.classList.toggle('m-edit',M_EDIT);
@@ -1463,7 +1481,7 @@ function renderDetail0(){
          <div class="row" style="margin-top:0"><div><label>PUSHBUTTON</label><input id="pb-name" list="pb-opts" placeholder="Pick from P/B database or type"></div><div><label>PANEL / LOCATION</label><input id="pb-panel" placeholder="e.g. OVHD · AIR COND panel"></div></div>
          <div class="row"><div><label>ACTION</label><select id="pb-action"><option>OFF then ON</option><option>ON then OFF</option><option>Push (momentary)</option><option>Other (see note)</option></select></div>
            <div><label>PHASE</label><select id="pb-phase"><option>Ground only</option></select></div></div>
-         <div class="row"><div><label>APPLIES TO</label><select id="pb-fam"><option value="\${f.fam}">\${f.fam} only</option><option value="\${is330(f.fam)?'A330':'ALL'}">\${is330(f.fam)?'A330 Classic + Enhanced':'NEO + CEO'}</option></select></div><div><label>NOTE / REF (optional)</label><input id="pb-note" placeholder="e.g. wait 10 s between OFF and ON"></div></div>
+         <div class="row"><div style="display:none"><label>APPLIES TO</label><select id="pb-fam"><option value="\${f.fam}">\${f.fam} only</option><option value="\${is330(f.fam)?'A330':'ALL'}">\${is330(f.fam)?'A330 Classic + Enhanced':'NEO + CEO'}</option></select></div><div><label>NOTE / REF (optional)</label><input id="pb-note" placeholder="e.g. wait 10 s between OFF and ON"></div></div>
          <div class="btns"><button class="b g" id="pb-save">Save P/B link</button></div>
          <datalist id="pb-opts">\${PB_DB.filter(p=>pbFamOk(p.fam,f.fam)).map(p=>\`<option value="\${esc(p.name)}">\${esc(p.panel)}</option>\`).join('')}</datalist>
        </div></details>`}
@@ -1500,14 +1518,15 @@ function renderDetail0(){
   if($('#pb-save')) $('#pb-save').onclick=()=>{const name=$('#pb-name').value.trim().toUpperCase(), panel=$('#pb-panel').value.trim();
     if(!name){toast('Enter the pushbutton name');return}
     const note=$('#pb-note').value.trim();
-    const rec={id:'p'+Date.now(),name,panel,action:$('#pb-action').value+(note?' · '+note:''),phase:$('#pb-phase').value,fam:$('#pb-fam').value};
-    EC('Linked P/B '+name+' · '+rec.action,()=>{(PBS[a.id]=PBS[a.id]||[]).push(rec); store.set('mcc_pbs',PBS);});};
+    askScope('P/B '+name, sc=>{ const rec={id:'p'+Date.now(),name,panel,action:$('#pb-action').value+(note?' · '+note:''),phase:$('#pb-phase').value,fam:f.fam,ac:sc};
+      EC('Linked P/B '+name+' · '+rec.action+' · '+(sc==='ALL'?'all aircraft':sc+' only'),()=>{(PBS[a.id]=PBS[a.id]||[]).push(rec); store.set('mcc_pbs',PBS);}); });};
   document.querySelectorAll('[data-unpb]').forEach(x=>x.onclick=e=>{e.preventDefault();EC('Removed P/B link',()=>{PBS[a.id]=(PBS[a.id]||[]).filter(p=>p.id!==x.dataset.unpb);store.set('mcc_pbs',PBS);});});
   if($('#l-add')) $('#l-add').onclick=()=>{const v=$('#l-fin').value.trim().toUpperCase(); if(!v) return;
     const hit=CB.find(c=>eff(c,f.fsn)&&c.fin.toUpperCase()===v)||CB.find(c=>c.fin.toUpperCase()===v)||CB.find(c=>eff(c,f.fsn)&&c.des.toUpperCase().includes(v));
     if(!hit){toast('FIN not found in C/B list');return}
-    EC('Linked C/B '+hit.fin+' ('+hit.des+')',()=>{LINKS[a.id]=[...new Set([...(LINKS[a.id]||[]),hit.fin])]; H.cb=H.cb.filter(x=>x!==hit.fin); store.set('mcc_hide',HIDE); store.set('mcc_links',LINKS);});};
-  document.querySelectorAll('[data-unlink]').forEach(x=>x.onclick=e=>{e.preventDefault();EC('Removed C/B link '+x.dataset.unlink,()=>{LINKS[a.id]=(LINKS[a.id]||[]).filter(y=>y!==x.dataset.unlink);store.set('mcc_links',LINKS);});});
+    askScope('C/B '+hit.fin, sc=>{ const k=sc==='ALL'?a.id:a.id+'@'+sc;
+      EC('Linked C/B '+hit.fin+' ('+hit.des+') · '+(sc==='ALL'?'all aircraft':sc+' only'),()=>{LINKS[k]=[...new Set([...(LINKS[k]||[]),hit.fin])]; H.cb=H.cb.filter(x=>x!==hit.fin); store.set('mcc_hide',HIDE); store.set('mcc_links',LINKS);}); });};
+  document.querySelectorAll('[data-unlink]').forEach(x=>x.onclick=e=>{e.preventDefault();EC('Removed C/B link '+x.dataset.unlink,()=>{[a.id,a.id+'@'+acKey()].forEach(k=>{if(LINKS[k])LINKS[k]=LINKS[k].filter(y=>y!==x.dataset.unlink);});store.set('mcc_links',LINKS);});});
   const me=(u=>u.name?u.name+' ('+u.id+')':u.id)(curUser());
   document.querySelectorAll('[data-delcmt]').forEach(x=>x.onclick=e=>{e.preventDefault();askConfirm('Delete comment?','Do you really want to delete this comment?',()=>{cmtDel(a.id+'|'+P,x.dataset.delcmt).then(ok=>{if(ok)toast('Comment deleted');renderDetail();renderAlerts();});});});
   $('#like-btn').onclick=()=>{let nm=(($('#cm-name')&&$('#cm-name').value)||store.get('era_name','')).trim();
@@ -3782,7 +3801,7 @@ setTimeout(liveInit,0);
 ].forEach(([rx,fins])=>ALERTS.forEach(a=>{ if(rx.test(a.t)) a.auto=[...new Set([...(a.auto||[]),...fins])]; }));
 Object.assign(P_RX,{ELTSW:/^COM ELT/,ELTTEST:/^COM ELT/,BLUEOVRD:/^HYD B (ELEC PUMP|SYS LO PR)/,APUEXTTEST:/^APU (FIRE DET|FIRE LOOP|AUTO)/,
  AUDIOSW:/^COM (ACP 3|AMU)/,CKPTDOOR:/^COM CKPT DOOR/,DOORVID:/^COM CKPT DOOR/});
-// ---- v1.51 strict relations: C/B named for the same computer + unit; P/B that directly controls the named system ----
+// ---- v1.52 strict relations: C/B named for the same computer + unit; P/B that directly controls the named system ----
 const REL_CB={"a64":["2RC2"],"a87":["2XU1","2XU2"],"a88":["2XU1","2XU2"],"a89":["1XT","2XT"],"a256":["3WW"],"a257":["2WW"],"a263":["14WV","44WV"],"a265":["14WV","44WV"]}, REL_PB={"a206":["BLUE ELEC PUMP P/B"],"a207":["BLUE ELEC PUMP P/B"],"a208":["BLUE ELEC PUMP P/B"],"a209":["BLUE ELEC PUMP P/B"],"a213":["ENG 1 PUMP P/B (G)","PTU P/B"],"a214":["ENG 1 PUMP P/B (G)","PTU P/B"],"a215":["ENG 1 PUMP P/B (G)","PTU P/B"],"a216":["ENG 1 PUMP P/B (G)","PTU P/B"],"a223":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a224":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a225":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a226":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a210":["BLUE ELEC PUMP P/B","ENG 1 PUMP P/B (G)","PTU P/B"],"a211":["BLUE ELEC PUMP P/B","ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a217":["ENG 1 PUMP P/B (G)","ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a277":["YELLOW ELEC PUMP P/B"],"a306":["ADR 1 P/B","ADR 2 P/B","ADR 3 P/B","AIR DATA SEL"],"a307":["ADR 1 P/B","ADR 2 P/B","ADR 3 P/B","AIR DATA SEL"],"a340":["IR 1 P/B","IR 2 P/B","IR 3 P/B","ATT HDG SEL"],"a336":["IR 1 MODE SEL","IR 2 MODE SEL","IR 3 MODE SEL"],"a94":["APU FIRE P/B (handle)","APU AGENT P/B"],"a100":["ENG 1 FIRE P/B (handle)","ENG 2 FIRE P/B (handle)","ENG 1 AGENT 1 P/B","ENG 1 AGENT 2 P/B","ENG 2 AGENT 1 P/B","ENG 2 AGENT 2 P/B"],"a110":["FWD CARGO DISCH P/B"],"a104":["AFT CARGO DISCH P/B"],"a115":["CARGO SMOKE TEST P/B"],"a97":["BLOWER P/B","EXTRACT P/B"],"a53":["ELT SW","ELT TEST/RESET P/B"],"a54":["ELT SW","ELT TEST/RESET P/B"],"a47":["3rd ACP (audio control panel)"],"a48":["3rd ACP (audio control panel)"],"a6":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a7":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a9":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a10":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a11":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a31":["FAC 1 P/B","FAC 2 P/B"],"a364":["ENG 1 BLEED P/B","ENG 2 BLEED P/B","X BLEED SEL","APU BLEED P/B","WING ANTI ICE P/B"],"a354":["ENG 1 BLEED P/B","ENG 2 BLEED P/B","X BLEED SEL","APU BLEED P/B"],"a76":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a81":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a82":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a85":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a93":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a183":["ENG 1 MASTER SW","ENG 2 MASTER SW"],"a255":["ECAM CLR P/B","ECAM RCL P/B"],"a256":["ECAM CLR P/B","ECAM RCL P/B"],"a257":["ECAM CLR P/B","ECAM RCL P/B"],"a259":["ECAM CLR P/B","ECAM RCL P/B"],"a260":["ECAM CLR P/B","ECAM RCL P/B"],"a261":["ECAM CLR P/B","ECAM RCL P/B"],"a263":["ECAM CLR P/B","ECAM RCL P/B"],"a264":["ECAM CLR P/B","ECAM RCL P/B"],"a265":["ECAM CLR P/B","ECAM RCL P/B"]};
 ALERTS.forEach(a=>{ if(REL_CB[a.id]) a.auto=[...new Set([...(a.auto||[]),...REL_CB[a.id]])];
   if(REL_PB[a.id]){ const ids=REL_PB[a.id].map(n=>(PB_DB.find(p=>p.name===n)||{}).id).filter(Boolean); a.pbs=[...new Set([...(a.pbs||[]),...ids])]; } });
