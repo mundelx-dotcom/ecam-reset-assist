@@ -35,7 +35,7 @@ html{overflow-y:scroll;scrollbar-gutter:stable}
  html,body{background:#0b1a4b}
  #app{background:var(--bg,#f3f5f8);min-height:100dvh}
 }
-/* ===== v1.50 iPhone redesign ===== */
+/* ===== v1.51 iPhone redesign ===== */
 .mbar{display:none}
 @media(max-width:700px){
  #detail{overflow:visible!important}
@@ -97,7 +97,7 @@ html{overflow-y:scroll;scrollbar-gutter:stable}
 
 .gonly{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;color:#1d4ed8;background:#eaf1ff;border:1px solid #c9dafc;border-radius:999px;padding:4px 10px}
 .ownfoot{margin:24px 0 8px;text-align:center;font-size:11px;color:var(--muted,#8a94a0)}
-/* ===== v1.50 iPhone / iPad ===== */
+/* ===== v1.51 iPhone / iPad ===== */
 nav .ni{display:none;font-style:normal}
 nav .ns{display:none}
 .mback{display:none}
@@ -919,7 +919,7 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
 <div id="app" class="hidden">
   <div class="hero photo"><div class="in">
 
-    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · A321neo · v1.50 · education only</span></h1>
+    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · A321neo · v1.51 · education only</span></h1>
       <p>A320neo / A321neo · ECAM alert → circuit breaker reset study aid · not approved maintenance data</p></div>
     <div class="user">For education and training only<br><button id="logout">Disclaimer</button></div>
   </div></div>
@@ -1219,15 +1219,15 @@ function statePush(n,obj){ if(!LIVE.on||!LIVE.sb||!LIVE.stOn) return; const snap
     jobs.push(LIVE.sb.rpc('era_put_state',{p_store:n,p_key:k,p_value:empty?null:obj[k],p_name:nm}).then(r=>{ if(r.error) throw r.error; if(empty) delete snap[k]; else snap[k]=cur; })); });
   if(!jobs.length) return; LIVE.pending[n]=(LIVE.pending[n]||0)+1;
   Promise.all(jobs).catch(e=>toast('Change not shared: '+(e.message||e))).finally(()=>{LIVE.pending[n]--; if(!LIVE.pending[n]) delete LIVE.pending[n]; liveSoon();});}
-async function cmtAdd(key,c){ if(!LIVE.on){(CMTS[key]=CMTS[key]||[]).push(c); saveCmts(); return true;}
+async function cmtAdd(key,c){ if(!LIVE.on||!LIVE.sb){(CMTS[key]=CMTS[key]||[]).push(c); saveCmts(); return true;}
   const r=await LIVE.sb.rpc('era_add_comment',{p_akey:key,p_name:c.name,p_text:c.text,p_eng:c.eng||'',p_edit:c.edit||'',p_token:devToken});
   if(r.error){toast('Comment not saved: '+r.error.message); return false;}
   MY_CMTS.push(r.data); store.set('era_my_cmts',MY_CMTS); (CMTS[key]=CMTS[key]||[]).push({...c,id:r.data}); liveSoon(); return true;}
-async function cmtDel(key,id){ if(!LIVE.on){CMTS[key]=(CMTS[key]||[]).filter(c=>c.id!==id); saveCmts(); return true;}
+async function cmtDel(key,id){ if(!LIVE.on||!LIVE.sb){CMTS[key]=(CMTS[key]||[]).filter(c=>c.id!==id); saveCmts(); return true;}
   const r=await LIVE.sb.rpc('era_delete_comment',{p_id:id,p_token:devToken});
   if(r.error||!r.data){toast('Only the author’s browser can delete this comment'); return false;}
   CMTS[key]=(CMTS[key]||[]).filter(c=>c.id!==id); liveSoon(); return true;}
-async function likeToggle(key,nm){ if(!LIVE.on){const L=LIKES[key]=LIKES[key]||[], i=L.findIndex(n=>n.toLowerCase()===nm.toLowerCase()); if(i>=0)L.splice(i,1); else L.push(nm); if(!L.length) delete LIKES[key]; saveLikes(); return i<0;}
+async function likeToggle(key,nm){ if(!LIVE.on||!LIVE.sb){const L=LIKES[key]=LIKES[key]||[], i=L.findIndex(n=>n.toLowerCase()===nm.toLowerCase()); if(i>=0)L.splice(i,1); else L.push(nm); if(!L.length) delete LIKES[key]; saveLikes(); return i<0;}
   const r=await LIVE.sb.rpc('era_toggle_like',{p_akey:key,p_name:nm});
   if(r.error){toast('Like not saved: '+r.error.message); return null;}
   const L=LIKES[key]=LIKES[key]||[], i=L.findIndex(n=>n.toLowerCase()===nm.toLowerCase()); if(r.data){if(i<0)L.push(nm);} else if(i>=0)L.splice(i,1); liveSoon(); return r.data;}
@@ -1371,7 +1371,7 @@ function backToList(){const id=state.alert;state.alert=null;renderAlerts();rende
 document.addEventListener('click',e=>{const b=e.target.closest('#mback');if(b){e.preventDefault();backToList();}
   const bn=e.target.closest('#banner');if(bn&&!e.target.closest('a'))bn.classList.toggle('open');});
 
-/* ===== v1.50 iPhone: sticky bar, collapsible sections, edit mode ===== */
+/* ===== v1.51 iPhone: sticky bar, collapsible sections, edit mode ===== */
 let M_EDIT=false; const M_OPEN=(()=>{try{return JSON.parse(sessionStorage.getItem('era_msec')||'{}')}catch(e){return {}}})();
 function phoneEnhance(){ const d=document.getElementById('detail'); if(!d) return;
   document.body.classList.toggle('m-edit',M_EDIT);
@@ -1413,6 +1413,7 @@ function renderDetail0(){
   const snap=locked?(valid.snap||null):null;
   const fins=snap?snap.fins:finsOf(a).filter(x=>!H.cb.includes(x)), applicable=fins.some(x=>cbsFor(x,f.fsn).length), anyClipped=fins.some(x=>cbsFor(x,f.fsn).some(c=>c.clip));
   const chapCbs=CB.filter(c=>eff(c,f.fsn)&&c.ata.slice(0,2)===a.ata);
+  const allCbs=[...chapCbs,...CB.filter(c=>eff(c,f.fsn)&&c.ata.slice(0,2)!==a.ata).sort((x,y)=>x.ata.localeCompare(y.ata))];
   const pbs=snap?snap.pbs:pbsOf(a,f).filter(p=>!H.pb.includes(p.id)), pbsPhase=pbs.filter(p=>phaseOk(p.phase,phase));
   const fam=f.fam||'';
   const relNotes=[];
@@ -1471,8 +1472,8 @@ function renderDetail0(){
      ${fins.length?`<table><thead><tr><th>FIN</th><th>DESIGNATION</th><th>PANEL</th><th>LOC</th><th></th></tr></thead><tbody>${cbRows(a,f,fins,locked)}</tbody></table>`:'<div class="muted" style="font-size:12px">None linked yet.</div>'}
      ${!locked&&(H.cb.length||H.pb.length||H.cond.length)?`<div class="muted" style="font-size:12px;margin-top:8px">Deleted for this ${inFlt?'in-flight':'on-ground'} procedure: ${H.cb.length} C/B · ${H.pb.length} P/B · ${H.cond.length} condition(s) · <a href="#" id="undel">restore all</a></div>`:''}
      ${locked?'':`<div style="display:grid;grid-template-columns:auto 1fr;gap:6px;margin-top:8px">
-       <button class="b p" id="l-add">+ Link C/B</button><input id="l-fin" list="l-opts" placeholder="FIN or designation (ATA ${a.ata} suggested)"></div>`}
-     <datalist id="l-opts">${chapCbs.map(c=>`<option value="${c.fin}">${esc(c.des)} · ${c.panel} ${c.loc}</option>`).join('')}</datalist>
+       <button class="b p" id="l-add">+ Link C/B</button><input id="l-fin" list="l-opts" placeholder="FIN or designation – any ATA chapter (ATA ${a.ata} listed first)"></div>`}
+     <datalist id="l-opts">${allCbs.map(c=>`<option value="${c.fin}">ATA ${c.ata} · ${esc(c.des)} · ${c.panel} ${c.loc}</option>`).join('')}</datalist>
      <details style="margin-top:10px"><summary class="muted" style="cursor:pointer;font-size:12px">All ATA ${a.ata} C/Bs (${chapCbs.length}): lookup aid only</summary>
        <div class="scroll" style="max-height:260px;margin-top:6px"><table><tbody>${chapCbs.map(c=>`<tr><td class="fin">${c.fin}</td><td>${esc(c.des)}</td><td class="loc">${c.panel}</td><td class="loc">${c.loc}</td></tr>`).join('')}</tbody></table></div></details>
 
@@ -1503,7 +1504,7 @@ function renderDetail0(){
     EC('Linked P/B '+name+' · '+rec.action,()=>{(PBS[a.id]=PBS[a.id]||[]).push(rec); store.set('mcc_pbs',PBS);});};
   document.querySelectorAll('[data-unpb]').forEach(x=>x.onclick=e=>{e.preventDefault();EC('Removed P/B link',()=>{PBS[a.id]=(PBS[a.id]||[]).filter(p=>p.id!==x.dataset.unpb);store.set('mcc_pbs',PBS);});});
   if($('#l-add')) $('#l-add').onclick=()=>{const v=$('#l-fin').value.trim().toUpperCase(); if(!v) return;
-    const hit=CB.find(c=>c.fin.toUpperCase()===v)||CB.find(c=>eff(c,f.fsn)&&c.des.toUpperCase().includes(v));
+    const hit=CB.find(c=>eff(c,f.fsn)&&c.fin.toUpperCase()===v)||CB.find(c=>c.fin.toUpperCase()===v)||CB.find(c=>eff(c,f.fsn)&&c.des.toUpperCase().includes(v));
     if(!hit){toast('FIN not found in C/B list');return}
     EC('Linked C/B '+hit.fin+' ('+hit.des+')',()=>{LINKS[a.id]=[...new Set([...(LINKS[a.id]||[]),hit.fin])]; H.cb=H.cb.filter(x=>x!==hit.fin); store.set('mcc_hide',HIDE); store.set('mcc_links',LINKS);});};
   document.querySelectorAll('[data-unlink]').forEach(x=>x.onclick=e=>{e.preventDefault();EC('Removed C/B link '+x.dataset.unlink,()=>{LINKS[a.id]=(LINKS[a.id]||[]).filter(y=>y!==x.dataset.unlink);store.set('mcc_links',LINKS);});});
@@ -3781,7 +3782,7 @@ setTimeout(liveInit,0);
 ].forEach(([rx,fins])=>ALERTS.forEach(a=>{ if(rx.test(a.t)) a.auto=[...new Set([...(a.auto||[]),...fins])]; }));
 Object.assign(P_RX,{ELTSW:/^COM ELT/,ELTTEST:/^COM ELT/,BLUEOVRD:/^HYD B (ELEC PUMP|SYS LO PR)/,APUEXTTEST:/^APU (FIRE DET|FIRE LOOP|AUTO)/,
  AUDIOSW:/^COM (ACP 3|AMU)/,CKPTDOOR:/^COM CKPT DOOR/,DOORVID:/^COM CKPT DOOR/});
-// ---- v1.50 strict relations: C/B named for the same computer + unit; P/B that directly controls the named system ----
+// ---- v1.51 strict relations: C/B named for the same computer + unit; P/B that directly controls the named system ----
 const REL_CB={"a64":["2RC2"],"a87":["2XU1","2XU2"],"a88":["2XU1","2XU2"],"a89":["1XT","2XT"],"a256":["3WW"],"a257":["2WW"],"a263":["14WV","44WV"],"a265":["14WV","44WV"]}, REL_PB={"a206":["BLUE ELEC PUMP P/B"],"a207":["BLUE ELEC PUMP P/B"],"a208":["BLUE ELEC PUMP P/B"],"a209":["BLUE ELEC PUMP P/B"],"a213":["ENG 1 PUMP P/B (G)","PTU P/B"],"a214":["ENG 1 PUMP P/B (G)","PTU P/B"],"a215":["ENG 1 PUMP P/B (G)","PTU P/B"],"a216":["ENG 1 PUMP P/B (G)","PTU P/B"],"a223":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a224":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a225":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a226":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a210":["BLUE ELEC PUMP P/B","ENG 1 PUMP P/B (G)","PTU P/B"],"a211":["BLUE ELEC PUMP P/B","ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a217":["ENG 1 PUMP P/B (G)","ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a277":["YELLOW ELEC PUMP P/B"],"a306":["ADR 1 P/B","ADR 2 P/B","ADR 3 P/B","AIR DATA SEL"],"a307":["ADR 1 P/B","ADR 2 P/B","ADR 3 P/B","AIR DATA SEL"],"a340":["IR 1 P/B","IR 2 P/B","IR 3 P/B","ATT HDG SEL"],"a336":["IR 1 MODE SEL","IR 2 MODE SEL","IR 3 MODE SEL"],"a94":["APU FIRE P/B (handle)","APU AGENT P/B"],"a100":["ENG 1 FIRE P/B (handle)","ENG 2 FIRE P/B (handle)","ENG 1 AGENT 1 P/B","ENG 1 AGENT 2 P/B","ENG 2 AGENT 1 P/B","ENG 2 AGENT 2 P/B"],"a110":["FWD CARGO DISCH P/B"],"a104":["AFT CARGO DISCH P/B"],"a115":["CARGO SMOKE TEST P/B"],"a97":["BLOWER P/B","EXTRACT P/B"],"a53":["ELT SW","ELT TEST/RESET P/B"],"a54":["ELT SW","ELT TEST/RESET P/B"],"a47":["3rd ACP (audio control panel)"],"a48":["3rd ACP (audio control panel)"],"a6":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a7":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a9":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a10":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a11":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a31":["FAC 1 P/B","FAC 2 P/B"],"a364":["ENG 1 BLEED P/B","ENG 2 BLEED P/B","X BLEED SEL","APU BLEED P/B","WING ANTI ICE P/B"],"a354":["ENG 1 BLEED P/B","ENG 2 BLEED P/B","X BLEED SEL","APU BLEED P/B"],"a76":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a81":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a82":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a85":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a93":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a183":["ENG 1 MASTER SW","ENG 2 MASTER SW"],"a255":["ECAM CLR P/B","ECAM RCL P/B"],"a256":["ECAM CLR P/B","ECAM RCL P/B"],"a257":["ECAM CLR P/B","ECAM RCL P/B"],"a259":["ECAM CLR P/B","ECAM RCL P/B"],"a260":["ECAM CLR P/B","ECAM RCL P/B"],"a261":["ECAM CLR P/B","ECAM RCL P/B"],"a263":["ECAM CLR P/B","ECAM RCL P/B"],"a264":["ECAM CLR P/B","ECAM RCL P/B"],"a265":["ECAM CLR P/B","ECAM RCL P/B"]};
 ALERTS.forEach(a=>{ if(REL_CB[a.id]) a.auto=[...new Set([...(a.auto||[]),...REL_CB[a.id]])];
   if(REL_PB[a.id]){ const ids=REL_PB[a.id].map(n=>(PB_DB.find(p=>p.name===n)||{}).id).filter(Boolean); a.pbs=[...new Set([...(a.pbs||[]),...ids])]; } });
