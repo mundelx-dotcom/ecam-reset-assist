@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b1a4b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="ECAM Reset">
 <meta name="format-detection" content="telephone=no">
 <title>ECAM Reset Assist · A320neo</title>
@@ -23,7 +23,14 @@
 body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"zero" 0}
 *{font-feature-settings:"tnum" 1,"zero" 0}
 html{overflow-y:scroll;scrollbar-gutter:stable}
-/* ===== v1.46 iPhone redesign ===== */
+#app.hidden ~ nav{display:none!important}
+@media(max-width:700px){
+ body:has(#app.hidden){padding-bottom:env(safe-area-inset-bottom)!important}
+ #login{min-height:100dvh;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+ html,body{background:#0b1a4b}
+ #app{background:var(--bg,#f3f5f8);min-height:100dvh}
+}
+/* ===== v1.47 iPhone redesign ===== */
 .mbar{display:none}
 @media(max-width:700px){
  #detail{overflow:visible!important}
@@ -85,7 +92,7 @@ html{overflow-y:scroll;scrollbar-gutter:stable}
 
 .gonly{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;color:#1d4ed8;background:#eaf1ff;border:1px solid #c9dafc;border-radius:999px;padding:4px 10px}
 .ownfoot{margin:24px 0 8px;text-align:center;font-size:11px;color:var(--muted,#8a94a0)}
-/* ===== v1.46 iPhone / iPad ===== */
+/* ===== v1.47 iPhone / iPad ===== */
 nav .ni{display:none;font-style:normal}
 nav .ns{display:none}
 .mback{display:none}
@@ -907,7 +914,7 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
 <div id="app" class="hidden">
   <div class="hero photo"><div class="in">
 
-    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.46 · education only</span></h1>
+    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.47 · education only</span></h1>
       <p>A320neo · ECAM alert → circuit breaker reset study aid · not approved maintenance data</p></div>
     <div class="user">For education and training only<br><button id="logout">Disclaimer</button></div>
   </div></div>
@@ -1351,7 +1358,7 @@ function backToList(){const id=state.alert;state.alert=null;renderAlerts();rende
 document.addEventListener('click',e=>{const b=e.target.closest('#mback');if(b){e.preventDefault();backToList();}
   const bn=e.target.closest('#banner');if(bn&&!e.target.closest('a'))bn.classList.toggle('open');});
 
-/* ===== v1.46 iPhone: sticky bar, collapsible sections, edit mode ===== */
+/* ===== v1.47 iPhone: sticky bar, collapsible sections, edit mode ===== */
 let M_EDIT=false; const M_OPEN=(()=>{try{return JSON.parse(sessionStorage.getItem('era_msec')||'{}')}catch(e){return {}}})();
 function phoneEnhance(){ const d=document.getElementById('detail'); if(!d) return;
   document.body.classList.toggle('m-edit',M_EDIT);
@@ -3756,7 +3763,7 @@ setTimeout(liveInit,0);
 ].forEach(([rx,fins])=>ALERTS.forEach(a=>{ if(rx.test(a.t)) a.auto=[...new Set([...(a.auto||[]),...fins])]; }));
 Object.assign(P_RX,{ELTSW:/^COM ELT/,ELTTEST:/^COM ELT/,BLUEOVRD:/^HYD B (ELEC PUMP|SYS LO PR)/,APUEXTTEST:/^APU (FIRE DET|FIRE LOOP|AUTO)/,
  AUDIOSW:/^COM (ACP 3|AMU)/,CKPTDOOR:/^COM CKPT DOOR/,DOORVID:/^COM CKPT DOOR/});
-// ---- v1.46 strict relations: C/B named for the same computer + unit; P/B that directly controls the named system ----
+// ---- v1.47 strict relations: C/B named for the same computer + unit; P/B that directly controls the named system ----
 const REL_CB={"a64":["2RC2"],"a87":["2XU1","2XU2"],"a88":["2XU1","2XU2"],"a89":["1XT","2XT"],"a256":["3WW"],"a257":["2WW"],"a263":["14WV","44WV"],"a265":["14WV","44WV"]}, REL_PB={"a206":["BLUE ELEC PUMP P/B"],"a207":["BLUE ELEC PUMP P/B"],"a208":["BLUE ELEC PUMP P/B"],"a209":["BLUE ELEC PUMP P/B"],"a213":["ENG 1 PUMP P/B (G)","PTU P/B"],"a214":["ENG 1 PUMP P/B (G)","PTU P/B"],"a215":["ENG 1 PUMP P/B (G)","PTU P/B"],"a216":["ENG 1 PUMP P/B (G)","PTU P/B"],"a223":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a224":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a225":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a226":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a210":["BLUE ELEC PUMP P/B","ENG 1 PUMP P/B (G)","PTU P/B"],"a211":["BLUE ELEC PUMP P/B","ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a217":["ENG 1 PUMP P/B (G)","ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a277":["YELLOW ELEC PUMP P/B"],"a306":["ADR 1 P/B","ADR 2 P/B","ADR 3 P/B","AIR DATA SEL"],"a307":["ADR 1 P/B","ADR 2 P/B","ADR 3 P/B","AIR DATA SEL"],"a340":["IR 1 P/B","IR 2 P/B","IR 3 P/B","ATT HDG SEL"],"a336":["IR 1 MODE SEL","IR 2 MODE SEL","IR 3 MODE SEL"],"a94":["APU FIRE P/B (handle)","APU AGENT P/B"],"a100":["ENG 1 FIRE P/B (handle)","ENG 2 FIRE P/B (handle)","ENG 1 AGENT 1 P/B","ENG 1 AGENT 2 P/B","ENG 2 AGENT 1 P/B","ENG 2 AGENT 2 P/B"],"a110":["FWD CARGO DISCH P/B"],"a104":["AFT CARGO DISCH P/B"],"a115":["CARGO SMOKE TEST P/B"],"a97":["BLOWER P/B","EXTRACT P/B"],"a53":["ELT SW","ELT TEST/RESET P/B"],"a54":["ELT SW","ELT TEST/RESET P/B"],"a47":["3rd ACP (audio control panel)"],"a48":["3rd ACP (audio control panel)"],"a6":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a7":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a9":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a10":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a11":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a31":["FAC 1 P/B","FAC 2 P/B"],"a364":["ENG 1 BLEED P/B","ENG 2 BLEED P/B","X BLEED SEL","APU BLEED P/B","WING ANTI ICE P/B"],"a354":["ENG 1 BLEED P/B","ENG 2 BLEED P/B","X BLEED SEL","APU BLEED P/B"],"a76":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a81":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a82":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a85":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a93":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a183":["ENG 1 MASTER SW","ENG 2 MASTER SW"],"a255":["ECAM CLR P/B","ECAM RCL P/B"],"a256":["ECAM CLR P/B","ECAM RCL P/B"],"a257":["ECAM CLR P/B","ECAM RCL P/B"],"a259":["ECAM CLR P/B","ECAM RCL P/B"],"a260":["ECAM CLR P/B","ECAM RCL P/B"],"a261":["ECAM CLR P/B","ECAM RCL P/B"],"a263":["ECAM CLR P/B","ECAM RCL P/B"],"a264":["ECAM CLR P/B","ECAM RCL P/B"],"a265":["ECAM CLR P/B","ECAM RCL P/B"]};
 ALERTS.forEach(a=>{ if(REL_CB[a.id]) a.auto=[...new Set([...(a.auto||[]),...REL_CB[a.id]])];
   if(REL_PB[a.id]){ const ids=REL_PB[a.id].map(n=>(PB_DB.find(p=>p.name===n)||{}).id).filter(Boolean); a.pbs=[...new Set([...(a.pbs||[]),...ids])]; } });
