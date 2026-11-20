@@ -23,8 +23,69 @@
 body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"zero" 0}
 *{font-feature-settings:"tnum" 1,"zero" 0}
 html{overflow-y:scroll;scrollbar-gutter:stable}
+/* ===== v1.46 iPhone redesign ===== */
+.mbar{display:none}
+@media(max-width:700px){
+ #detail{overflow:visible!important}
+ .mbar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:12;margin:-1px -1px 0;padding:8px 10px calc(8px);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);border-radius:10px 10px 0 0}
+ .mb-back{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:26px;line-height:34px;color:var(--blue);padding:0}
+ .mb-t{flex:1;min-width:0;font:700 15px/1.2 inherit;color:#0b1a4b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.2px}
+ .mb-edit{flex:none;height:34px;padding:0 12px;border-radius:17px;border:1px solid var(--line);background:#fff;font:600 13px/1 inherit;color:var(--blue)}
+ .mb-edit.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+ #detail>.hd{display:none}
+ #detail .gonly{display:none}
+ #detail .body>.ecam,#detail .body>div:first-child .ecam{font-size:17px}
+ .msec{border:1px solid var(--line);border-radius:12px;margin:10px 0;background:#fff;overflow:hidden}
+ .msec-h{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:8px;width:100%;padding:12px 12px;font:700 12px/1.2 inherit;letter-spacing:.5px;color:#334;cursor:pointer;text-transform:uppercase}
+ .msec-h .livebadge-slot{margin-left:auto}
+ .msec-h .chev{margin-left:auto;font-size:20px;line-height:1;color:#99a;transform:rotate(90deg);transition:transform .15s}
+ .msec-h .livebadge-slot~.chev{margin-left:6px}
+ .msec.shut .chev{transform:rotate(0)}
+ .msec.shut .msec-c{display:none}
+ .msec-c{padding:0 12px 12px}
+ .mcount{min-width:20px;height:20px;border-radius:10px;background:#eef2f8;color:#456;font:700 11px/20px inherit;text-align:center;padding:0 6px}
+ /* edit mode: editing controls only when Edit is on */
+ body:not(.m-edit) #detail .xdel,body:not(.m-edit) #detail div:has(> #c-add),body:not(.m-edit) #detail #pbform,body:not(.m-edit) #detail div:has(> #l-add),body:not(.m-edit) #detail .src{display:none!important}
+ body.m-edit #detail .msec{border-color:#bcd0f5}
+ /* conditions as tappable checklist */
+ #detail .cond{padding:12px 10px;border-radius:10px;gap:10px;align-items:flex-start}
+ #detail .cond input{width:22px;height:22px;flex:none;margin-top:1px}
+ /* linked C/Bs as cards */
+ #detail table{display:block;white-space:normal!important}
+ #detail table thead{display:none}
+ #detail table tbody{display:grid;gap:8px}
+ #detail table tr{display:grid;grid-template-columns:1fr auto auto auto;grid-template-areas:"fin pan loc del" "des des des des";gap:2px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2,#f7f9fc)}
+ #detail table td{border:0!important;padding:0!important}
+ #detail table td:nth-child(1){grid-area:fin;font-size:16px}
+ #detail table td:nth-child(2){grid-area:des;font-size:13px;color:#334}
+ #detail table td:nth-child(3){grid-area:pan;font-weight:700}
+ #detail table td:nth-child(4){grid-area:loc;font-weight:700}
+ #detail table td:nth-child(5){grid-area:del}
+ #detail .pbcard{flex-direction:column;border-radius:12px}
+ #detail .pbsnap{width:100%;height:150px}
+ /* C/B list view as cards */
+ #v-cbs .scroll{overflow:visible!important;max-height:none!important}
+ #v-cbs table{display:block}
+ #v-cbs thead{display:none}
+ #v-cbs tbody{display:grid;gap:8px;padding:0 10px 10px}
+ #v-cbs tr{display:grid;grid-template-columns:1fr auto auto;grid-template-areas:"fin pan loc" "des des des" "ata ata ata";gap:2px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+ #v-cbs td{border:0!important;padding:0!important}
+ #v-cbs td:nth-child(1){grid-area:fin;font-size:16px}
+ #v-cbs td:nth-child(2){grid-area:des;font-size:13px}
+ #v-cbs td:nth-child(3){grid-area:pan;font-weight:700}
+ #v-cbs td:nth-child(4){grid-area:loc;font-weight:700}
+ #v-cbs td:nth-child(5){grid-area:ata;font-size:11px;color:#889}
+ #v-cbs td:nth-child(5)::before{content:"ATA "}
+ #v-cbs td:nth-child(6){display:none}
+ /* alert list rows */
+ .aitem{padding:14px 14px!important}
+ .aitem .t{font-size:14.5px}
+ #v-assist .grid2>:first-child .hd{position:sticky;top:0;z-index:3;background:#fff}
+}
+
+.gonly{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;color:#1d4ed8;background:#eaf1ff;border:1px solid #c9dafc;border-radius:999px;padding:4px 10px}
 .ownfoot{margin:24px 0 8px;text-align:center;font-size:11px;color:var(--muted,#8a94a0)}
-/* ===== v1.45 iPhone / iPad ===== */
+/* ===== v1.46 iPhone / iPad ===== */
 nav .ni{display:none;font-style:normal}
 nav .ns{display:none}
 .mback{display:none}
@@ -827,7 +888,7 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
       <ol>
         <li><b>Education and training only.</b> This website is a personal study and familiarisation aid. It is <b>not</b> approved maintenance data, not an operational tool and not a substitute for type training, authorisation or certification privileges.</li>
         <li><b>Always use your current approved documentation</b> for the specific aircraft (MSN and modification status): Airbus <b>AMM</b>, <b>TSM</b>, <b>AWM / ASM</b> (wiring and circuit breakers), <b>IPC</b>, <b>MEL / CDL</b>, <b>FCOM</b>, <b>QRH</b> and <b>FCTM</b>, engine manufacturer data, and your company procedures: company <b>QRH</b>, Operations Manual, Maintenance Control / MOE procedures and approved Engineering instructions.</li>
-        <li><b>In flight</b>, the flight crew follows ECAM, QRH and FCOM and the operator&#39;s circuit breaker reset policy. Nothing on this site permits or recommends a reset.</li>
+        <li><b>On-ground resets only.</b> This site covers maintenance resets on the ground. In flight, the flight crew follows ECAM, QRH and FCOM and the operator&#39;s circuit breaker reset policy; nothing on this site applies to flight.</li>
         <li><b>On ground</b>, troubleshooting, resets and return to service must be carried out and certified by appropriately authorised staff in accordance with approved data and your organisation&#39;s procedures.</li>
         <li><b>Data may be incomplete, out of date or wrong.</b> C/B FINs, designations, panel locations and effectivity were compiled from a single A320neo and may not match your aircraft (MSN, modification status). Reset guidance is written by us from general line-maintenance practice and must be checked against your current TSM. ECAM-to-C/B, P/B and MMEL links are automatically generated drafts and have not been validated; MMEL references point to the public FAA MMEL (A318–A321, Rev 30 draft).</li>
         <li><b>Comments and likes are public.</b> Comments and 👍 likes are shared with all users of this site and are not reviewed or approved. Do not post personal, company-confidential or copyrighted material. Changes to reset procedures (conditions, C/B and P/B links) are also shared with all users, together with the name and comment of whoever made them.</li>
@@ -846,7 +907,7 @@ body.zact #cockpit .ovxwrap{box-shadow:0 0 0 3px rgba(127,162,255,.85)}
 <div id="app" class="hidden">
   <div class="hero photo"><div class="in">
 
-    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.45 · education only</span></h1>
+    <div class="ttl"><h1>ECAM Reset Assist<span class="proto">A320neo · v1.46 · education only</span></h1>
       <p>A320neo · ECAM alert → circuit breaker reset study aid · not approved maintenance data</p></div>
     <div class="user">For education and training only<br><button id="logout">Disclaimer</button></div>
   </div></div>
@@ -1095,15 +1156,15 @@ const ENG_DIFF=[
 const engDiffHtml=(f,open)=>`<details class="engdiff"${open?' open':''}><summary>LEAP-1A vs PW1100G-JM: key differences (education)</summary><ul>${ENG_DIFF.map(([h,a,b])=>`<li><b>${h}:</b> ${esc(a)} <i>${esc(b)}</i></li>`).join('')}</ul><div class="muted" style="font-size:11.5px">General information only; current selection: ${esc(f.engine)}. Verify against the approved data for your aircraft.</div></details>`;
 let CMTS=store.get('era_comments',{}); // alertId|G/F -> [{id,text,name,eng,ts}]
 const cmtsOf=(id,P)=>CMTS[id+'|'+P]||[];
-const cmtCount=id=>cmtsOf(id,'G').length+cmtsOf(id,'F').length;
+const cmtCount=id=>cmtsOf(id,'G').length;
 const saveCmts=()=>store.set('era_comments',CMTS);
 const CMT_FRESH_H=12;
-const cmtLast=id=>Math.max(0,...[...cmtsOf(id,'G'),...cmtsOf(id,'F')].map(c=>Date.parse(c.ts)||0));
+const cmtLast=id=>Math.max(0,...cmtsOf(id,'G').map(c=>Date.parse(c.ts)||0));
 function cmtMark(id){const n=cmtCount(id); if(!n) return ''; const age=(Date.now()-cmtLast(id))/36e5;
   return age<CMT_FRESH_H?`<span class="bulb" title="${n} comment(s) · new in the last ${CMT_FRESH_H} h">💡</span>`:`<span class="cmtold" title="${n} comment(s)">✎</span>`;}
 let LIKES=store.get('era_likes',{}); // alertId|G/F -> [names]
 const likesOf=(id,P)=>LIKES[id+'|'+P]||[];
-const likeCount=id=>likesOf(id,'G').length+likesOf(id,'F').length;
+const likeCount=id=>likesOf(id,'G').length;
 const saveLikes=()=>store.set('era_likes',LIKES);
 /* ---- shared comments & likes (Supabase). Empty URL/KEY = local-only mode ---- */
 const SB_URL='https://jyknframvdazpivsykbf.supabase.co', SB_KEY='sb_publishable_aWTJPk1OXZ5uB6aHnzUAhQ_qKznualv';
@@ -1289,8 +1350,35 @@ const isPhone=()=>matchMedia('(max-width:700px)').matches; let LIST_Y=0;
 function backToList(){const id=state.alert;state.alert=null;renderAlerts();renderDetail();requestAnimationFrame(()=>{const it=document.querySelector(`.aitem[data-id="${id}"]`);if(it){it.classList.add('was');it.scrollIntoView({block:'center'});}else window.scrollTo({top:LIST_Y});});}
 document.addEventListener('click',e=>{const b=e.target.closest('#mback');if(b){e.preventDefault();backToList();}
   const bn=e.target.closest('#banner');if(bn&&!e.target.closest('a'))bn.classList.toggle('open');});
-function renderDetail(){
-  const a=alertById(state.alert), f=state.tail, phase=state.phase, inFlt=phase==='FLIGHT';
+
+/* ===== v1.46 iPhone: sticky bar, collapsible sections, edit mode ===== */
+let M_EDIT=false; const M_OPEN=(()=>{try{return JSON.parse(sessionStorage.getItem('era_msec')||'{}')}catch(e){return {}}})();
+function phoneEnhance(){ const d=document.getElementById('detail'); if(!d) return;
+  document.body.classList.toggle('m-edit',M_EDIT);
+  if(!isPhone()||!state.alert) return; const a=alertById(state.alert); if(!a) return;
+  const body=d.querySelector('.body'); if(!body||body.dataset.m) return; body.dataset.m='1';
+  const old=body.querySelector('#mback'); if(old) old.remove();
+  const bar=document.createElement('div'); bar.className='mbar';
+  bar.innerHTML=`<button id="mback" class="mb-back" aria-label="Back to alerts">‹</button><div class="mb-t">${esc(a.t)}</div><button id="medit" class="mb-edit ${M_EDIT?'on':''}">${M_EDIT?'Done':'✎ Edit'}</button>`;
+  d.insertBefore(bar,d.firstChild);
+  const kids=[...body.children]; let sec=null;
+  kids.forEach(el=>{ if(el.classList&&el.classList.contains('step')){
+      const key=el.textContent.replace(/\(\d+\)|·.*$/g,'').trim().slice(0,40);
+      const me=document.createElement('section'); sec=me; me.className='msec'+(M_OPEN[key]===false?' shut':''); me.dataset.k=key;
+      const h=document.createElement('button'); h.className='msec-h'; h.type='button'; h.innerHTML=el.innerHTML+'<span class="chev">›</span>';
+      const c=document.createElement('div'); c.className='msec-c';
+      sec.appendChild(h); sec.appendChild(c); el.replaceWith(sec);
+      h.onclick=()=>{me.classList.toggle('shut'); M_OPEN[key]=!me.classList.contains('shut'); try{sessionStorage.setItem('era_msec',JSON.stringify(M_OPEN))}catch(_){}};
+    } else if(sec){ sec.querySelector('.msec-c').appendChild(el); } });
+  // count chips in headers
+  d.querySelectorAll('.msec').forEach(sc=>{ const n=[...sc.querySelectorAll('.cond,.pbcard,tbody tr,.mmelchip,.cmt')].filter(x=>!x.closest('details')).length; if(n){const b=document.createElement('span');b.className='mcount';b.textContent=n;sc.querySelector('.msec-h').insertBefore(b,sc.querySelector('.chev'));} });
+  $('#medit').onclick=()=>{M_EDIT=!M_EDIT; renderDetail();};
+}
+
+function renderDetail(){ try{ return renderDetail0(); } finally { try{phoneEnhance();}catch(e){console.warn(e)} } }
+function renderDetail0(){
+  state.phase='GROUND';
+  const a=alertById(state.alert), f=state.tail, phase='GROUND', inFlt=false;
   document.body.classList.toggle('has-alert',!!a);
   if(!a){$('#detail').innerHTML='<div class="empty">Select an ECAM alert</div>';return}
   const P=pk(phase), key=f.reg+'|'+a.id+'|'+P, valid0=VALID[key], H=hideOf(a.id,P);
@@ -1327,8 +1415,7 @@ function renderDetail(){
      <button class="mback" id="mback">‹ All alerts</button>
      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
        <div class="ecam">${esc(a.t)}</div>
-       <div style="text-align:right"><div class="tabs" id="ptabs" style="margin:0"><button data-p="GROUND" class="${!inFlt?'on':''}" style="${!inFlt?'color:var(--blue)':''}">On ground</button><button data-p="FLIGHT" class="${inFlt?'on':''}" style="${inFlt?'color:var(--red)':''}">In flight</button></div>
-       <div class="muted" style="font-size:12px;margin-top:4px">${inFlt?'In flight: only resets permitted by QRH/FCOM.':'On ground: resets per AMM/TSM.'}</div></div>
+       <div class="gonly">ON-GROUND RESET</div>
      </div>
      ${stBanner}
           ${relNotes.length?`<div class="step">NOTES</div>`+relNotes.slice(0,3).map(n=>`<div style="background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:6px"><span class="muted mono" style="font-size:11px">${esc(n.tail||'')}${n.station?' · '+esc(n.station):''} · ${noteAuthor(n)} · ${n.ts.slice(0,10)}</span><div style="white-space:pre-wrap;font-size:13px">${esc(n.text)}</div></div>`).join(''):''}
@@ -1349,7 +1436,7 @@ function renderDetail(){
        <div style="border:1px solid var(--line);border-radius:6px;padding:10px;margin-top:8px;background:var(--panel2)">
          <div class="row" style="margin-top:0"><div><label>PUSHBUTTON</label><input id="pb-name" list="pb-opts" placeholder="Pick from P/B database or type"></div><div><label>PANEL / LOCATION</label><input id="pb-panel" placeholder="e.g. OVHD · AIR COND panel"></div></div>
          <div class="row"><div><label>ACTION</label><select id="pb-action"><option>OFF then ON</option><option>ON then OFF</option><option>Push (momentary)</option><option>Other (see note)</option></select></div>
-           <div><label>PHASE</label><select id="pb-phase"><option>Ground only</option><option>Ground + flight (QRH/FCOM allowed)</option></select></div></div>
+           <div><label>PHASE</label><select id="pb-phase"><option>Ground only</option></select></div></div>
          <div class="row"><div><label>APPLIES TO</label><select id="pb-fam"><option value="\${f.fam}">\${f.fam} only</option><option value="\${is330(f.fam)?'A330':'ALL'}">\${is330(f.fam)?'A330 Classic + Enhanced':'NEO + CEO'}</option></select></div><div><label>NOTE / REF (optional)</label><input id="pb-note" placeholder="e.g. wait 10 s between OFF and ON"></div></div>
          <div class="btns"><button class="b g" id="pb-save">Save P/B link</button></div>
          <datalist id="pb-opts">\${PB_DB.filter(p=>pbFamOk(p.fam,f.fam)).map(p=>\`<option value="\${esc(p.name)}">\${esc(p.panel)}</option>\`).join('')}</datalist>
@@ -1374,7 +1461,6 @@ function renderDetail(){
      <div class="step">SUGGESTION</div>
      <div class="reco ${reco.cls}"><h4>${reco.h}</h4><div>${reco.b}</div></div>
    </div>`;
-  document.querySelectorAll('#ptabs button').forEach(b=>b.onclick=()=>{state.phase=b.dataset.p;renderDetail();});
   const ca=$('#c-add'); if(ca){ ca.onclick=()=>{const v=$('#c-txt').value.trim(); if(!v) return; EC('Added condition: '+v,()=>{(CONDS[a.id+'|'+P]=CONDS[a.id+'|'+P]||(P==='G'?[...(CONDS[a.id]||[])]:[])).push(v); H.cond=H.cond.filter(x=>x!==v); store.set('mcc_conds',CONDS); store.set('mcc_hide',HIDE);});};
     $('#c-txt').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ca.click();}}); }
   const saveH=()=>{store.set('mcc_hide',HIDE);};
@@ -3641,7 +3727,7 @@ function _renderPbSide(){
 // ---------- ALL COMMENTS ----------
 function renderLog(){
   const q=$('#cm-q').value.trim().toLowerCase();
-  const all=[]; Object.keys(CMTS).forEach(k=>{const [id,P]=k.split('|'), a=alertById(id); if(!a) return; (CMTS[k]||[]).forEach(c=>all.push({a,P,c}));});
+  const all=[]; Object.keys(CMTS).forEach(k=>{const [id,P]=k.split('|'), a=alertById(id); if(!a||P==='F') return; (CMTS[k]||[]).forEach(c=>all.push({a,P,c}));});
   all.sort((x,y)=>y.c.ts.localeCompare(x.c.ts));
   const list=all.filter(({a,c})=>!q||[a.t,c.text,c.name,c.eng,c.edit].join(' ').toLowerCase().includes(q));
   {const nt=document.getElementById('cm-note'); if(nt&&LIVE.on) nt.textContent='Comments and 👍 likes are shared with everybody in real time. Click a comment to open its ECAM reset.';}
@@ -3649,7 +3735,7 @@ function renderLog(){
   $('#cm-list').innerHTML=list.length?list.map(({a,P,c})=>`<button class="citem" data-ga="${a.id}" data-gp="${P}"><div><span class="ecam" style="font-size:12px;padding:2px 7px">${esc(a.t)}</span> <span class="ctag ${P==='F'?'f':''}">${P==='F'?'IN FLIGHT':'ON GROUND'}</span><span class="muted" style="font-size:11.5px">ATA ${a.ata}</span></div>
      ${c.edit?`<div class="cedit" style="margin-top:5px">✎ CHANGE: ${esc(c.edit)}</div>`:''}<div style="white-space:pre-wrap;margin-top:5px;font-size:13px">${esc(c.text)}</div><div class="muted" style="font-size:11.5px;margin-top:3px">${c.name?esc(c.name)+' · ':''}${c.ts.slice(0,16).replace('T',' ')} UTC</div></button>`).join('')
     :'<div class="empty">No comments yet.<br>Open an ECAM alert and add a comment below its reset procedure.</div>';
-  document.querySelectorAll('[data-ga]').forEach(b=>b.onclick=()=>{state.alert=b.dataset.ga; state.phase=b.dataset.gp==='F'?'FLIGHT':'GROUND'; $('#aq').value=''; $('#achap').value=''; $('#alink').value=''; go('assist'); refreshTail();
+  document.querySelectorAll('[data-ga]').forEach(b=>b.onclick=()=>{state.alert=b.dataset.ga; state.phase='GROUND'; $('#aq').value=''; $('#achap').value=''; $('#alink').value=''; go('assist'); refreshTail();
     setTimeout(()=>document.querySelector('.aitem.on')?.scrollIntoView({block:'center'}),50);});
 }
 $('#cm-q').oninput=renderLog;
@@ -3670,6 +3756,10 @@ setTimeout(liveInit,0);
 ].forEach(([rx,fins])=>ALERTS.forEach(a=>{ if(rx.test(a.t)) a.auto=[...new Set([...(a.auto||[]),...fins])]; }));
 Object.assign(P_RX,{ELTSW:/^COM ELT/,ELTTEST:/^COM ELT/,BLUEOVRD:/^HYD B (ELEC PUMP|SYS LO PR)/,APUEXTTEST:/^APU (FIRE DET|FIRE LOOP|AUTO)/,
  AUDIOSW:/^COM (ACP 3|AMU)/,CKPTDOOR:/^COM CKPT DOOR/,DOORVID:/^COM CKPT DOOR/});
+// ---- v1.46 strict relations: C/B named for the same computer + unit; P/B that directly controls the named system ----
+const REL_CB={"a64":["2RC2"],"a87":["2XU1","2XU2"],"a88":["2XU1","2XU2"],"a89":["1XT","2XT"],"a256":["3WW"],"a257":["2WW"],"a263":["14WV","44WV"],"a265":["14WV","44WV"]}, REL_PB={"a206":["BLUE ELEC PUMP P/B"],"a207":["BLUE ELEC PUMP P/B"],"a208":["BLUE ELEC PUMP P/B"],"a209":["BLUE ELEC PUMP P/B"],"a213":["ENG 1 PUMP P/B (G)","PTU P/B"],"a214":["ENG 1 PUMP P/B (G)","PTU P/B"],"a215":["ENG 1 PUMP P/B (G)","PTU P/B"],"a216":["ENG 1 PUMP P/B (G)","PTU P/B"],"a223":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a224":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a225":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a226":["ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a210":["BLUE ELEC PUMP P/B","ENG 1 PUMP P/B (G)","PTU P/B"],"a211":["BLUE ELEC PUMP P/B","ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a217":["ENG 1 PUMP P/B (G)","ENG 2 PUMP P/B (Y)","YELLOW ELEC PUMP P/B","PTU P/B"],"a277":["YELLOW ELEC PUMP P/B"],"a306":["ADR 1 P/B","ADR 2 P/B","ADR 3 P/B","AIR DATA SEL"],"a307":["ADR 1 P/B","ADR 2 P/B","ADR 3 P/B","AIR DATA SEL"],"a340":["IR 1 P/B","IR 2 P/B","IR 3 P/B","ATT HDG SEL"],"a336":["IR 1 MODE SEL","IR 2 MODE SEL","IR 3 MODE SEL"],"a94":["APU FIRE P/B (handle)","APU AGENT P/B"],"a100":["ENG 1 FIRE P/B (handle)","ENG 2 FIRE P/B (handle)","ENG 1 AGENT 1 P/B","ENG 1 AGENT 2 P/B","ENG 2 AGENT 1 P/B","ENG 2 AGENT 2 P/B"],"a110":["FWD CARGO DISCH P/B"],"a104":["AFT CARGO DISCH P/B"],"a115":["CARGO SMOKE TEST P/B"],"a97":["BLOWER P/B","EXTRACT P/B"],"a53":["ELT SW","ELT TEST/RESET P/B"],"a54":["ELT SW","ELT TEST/RESET P/B"],"a47":["3rd ACP (audio control panel)"],"a48":["3rd ACP (audio control panel)"],"a6":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a7":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a9":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a10":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a11":["CAB PRESS MODE SEL P/B","MAN V/S CTL SW"],"a31":["FAC 1 P/B","FAC 2 P/B"],"a364":["ENG 1 BLEED P/B","ENG 2 BLEED P/B","X BLEED SEL","APU BLEED P/B","WING ANTI ICE P/B"],"a354":["ENG 1 BLEED P/B","ENG 2 BLEED P/B","X BLEED SEL","APU BLEED P/B"],"a76":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a81":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a82":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a85":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a93":["BAT 1 P/B","BAT 2 P/B","BUS TIE P/B"],"a183":["ENG 1 MASTER SW","ENG 2 MASTER SW"],"a255":["ECAM CLR P/B","ECAM RCL P/B"],"a256":["ECAM CLR P/B","ECAM RCL P/B"],"a257":["ECAM CLR P/B","ECAM RCL P/B"],"a259":["ECAM CLR P/B","ECAM RCL P/B"],"a260":["ECAM CLR P/B","ECAM RCL P/B"],"a261":["ECAM CLR P/B","ECAM RCL P/B"],"a263":["ECAM CLR P/B","ECAM RCL P/B"],"a264":["ECAM CLR P/B","ECAM RCL P/B"],"a265":["ECAM CLR P/B","ECAM RCL P/B"]};
+ALERTS.forEach(a=>{ if(REL_CB[a.id]) a.auto=[...new Set([...(a.auto||[]),...REL_CB[a.id]])];
+  if(REL_PB[a.id]){ const ids=REL_PB[a.id].map(n=>(PB_DB.find(p=>p.name===n)||{}).id).filter(Boolean); a.pbs=[...new Set([...(a.pbs||[]),...ids])]; } });
 // ---------- start ----------
 let inited=false;
 function init(){ if(inited) return; inited=true; buildTailSelect(); renderPhase(); refreshTail();
